@@ -21,7 +21,24 @@
             "request": "launch",
             "preLaunchTask": "quick-build",
             "program": "${workspaceFolder}/AdventOfCode/bin/Debug/net8.0/AdventOfCode.dll",
-            "args": ["all"],
+            "args": [
+                "--run",
+                "all"
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
+            "name": "Run specific daily challenges (quick)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "quick-build",
+            "program": "${workspaceFolder}/AdventOfCode/bin/Debug/net8.0/AdventOfCode.dll",
+            "args": [
+                "--run",
+                "1 -1 26"
+            ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "console": "internalConsole"
