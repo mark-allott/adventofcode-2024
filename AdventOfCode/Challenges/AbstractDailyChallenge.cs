@@ -23,6 +23,8 @@ public abstract class AbstractDailyChallenge
 
 	#endregion
 
+	#region IDailyChallenge implementation
+
 	public int DayNumber { get; protected set; }
 
 	public string Filename { get; protected set; }
@@ -30,8 +32,6 @@ public abstract class AbstractDailyChallenge
 	public string PartOneResult { get; protected set; }
 
 	public string PartTwoResult { get; protected set; }
-
-	#region IDailyChallenge implementation
 
 	/// <inheritdoc/>
 	public bool Execute()
@@ -76,7 +76,7 @@ public abstract class AbstractDailyChallenge
 	}
 
 	/// <inheritdoc/>
-	public virtual bool ExecutePartTwo()
+	public bool ExecutePartTwo()
 	{
 		try
 		{
