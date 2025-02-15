@@ -56,7 +56,7 @@ public abstract class AbstractDailyChallenge
 		{
 			return PartOne();
 		}
-		catch (System.Exception e)
+		catch (Exception e)
 		{
 			PartOneResult = e.Message;
 			return false;
@@ -82,7 +82,7 @@ public abstract class AbstractDailyChallenge
 		{
 			return PartTwo();
 		}
-		catch (System.Exception e)
+		catch (Exception e)
 		{
 			PartTwoResult = e.Message;
 			return false;
@@ -100,5 +100,71 @@ public abstract class AbstractDailyChallenge
 		throw new NotImplementedException($"{nameof(ExecutePartTwo)} is not implemented");
 	}
 
+	#endregion
+
+	#region Utility methods
+
+	/// <summary>
+	/// Holds the "raw" contents of the input file
+	/// </summary>
+	protected List<string> InputFileLines = null!;
+
+	/// <summary>
+	/// Loads the file specified in the constructor from the data folder
+	/// </summary>
+	/// <param name="forceReload">Indicates whether a reload of the data is required</param>
+	protected void LoadAndReadFile(bool forceReload = false)
+	{
+		//	Don't re-read data if already present, or forced
+		if (!(InputFileLines is null || InputFileLines.Count == 0 || forceReload))
+			return;
+
+		try
+		{
+			var cwd = Directory.GetCurrentDirectory();
+			var inputFilePath = Path.Combine(cwd, "data", Filename);
+			InputFileLines = new List<string>(File.ReadAllLines(inputFilePath));
+		}
+		catch (IOException iox)
+		{
+			Console.WriteLine(iox.Message);
+		}
+	}
+
+	/// <summary>
+	/// Parses the <paramref name="lines"/> supplied and converts in to a list of integer lists
+	/// </summary>
+	/// <param name="lines">The strings forming the lists to be parsed</param>
+	/// <returns>A list of integer lists, representing the contents of the <paramref name="lines"/></returns>
+	/// <exception cref="ArgumentException"></exception>
+	protected static List<List<int>> ParseLinesToIntegerLists(IEnumerable<string> lines)
+	{
+		var results = new List<List<int>>();
+		var rowNumber = 1;
+
+		foreach (var line in lines)
+		{
+			var parts = line.Split([' ', ','], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+			var counter = 1;
+			var rowValues = new List<int>();
+			foreach (var part in parts)
+			{
+				if (int.TryParse(part, out var v))
+				{
+					counter++;
+					rowValues.Add(v);
+				}
+				else
+				{
+					var message = $"Data error on line {rowNumber} with part #{counter} => '{part}'";
+					Console.WriteLine(message);
+					throw new ArgumentException(message);
+				}
+			}
+			results.Add(rowValues);
+		}
+		return results;
+	}
 	#endregion
 }
