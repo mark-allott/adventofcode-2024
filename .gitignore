@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Do not include the Advent of Code data files (must be signed up to view them)
+data/
