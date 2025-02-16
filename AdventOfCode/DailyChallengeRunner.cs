@@ -21,6 +21,13 @@ public class DailyChallengeRunner
 		var x = Configuration["run"];
 		var challenges = GetDailyChallenges();
 
+		//	Check: are there any challenges to be run?
+		if (challenges.Count == 0)
+		{
+			Console.WriteLine("No challenges to run!");
+			return Task.CompletedTask;
+		}
+
 		//	run using the different options
 		if (string.IsNullOrWhiteSpace(x))
 		{
