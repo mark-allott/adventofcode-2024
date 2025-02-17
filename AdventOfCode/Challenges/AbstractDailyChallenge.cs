@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using AdventOfCode.Extensions;
 using AdventOfCode.Interfaces;
 
 namespace AdventOfCode.Challenges;
@@ -144,25 +145,9 @@ public abstract class AbstractDailyChallenge
 
 		foreach (var line in lines)
 		{
-			var parts = line.Split([' ', ','], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-			var counter = 1;
-			var rowValues = new List<int>();
-			foreach (var part in parts)
-			{
-				if (int.TryParse(part, out var v))
-				{
-					counter++;
-					rowValues.Add(v);
-				}
-				else
-				{
-					var message = $"Data error on line {rowNumber} with part #{counter} => '{part}'";
-					Console.WriteLine(message);
-					throw new ArgumentException(message);
-				}
-			}
+			var rowValues = line.ParseStringToListOfInt(rowNumber);
 			results.Add(rowValues);
+			rowNumber++;
 		}
 		return results;
 	}
