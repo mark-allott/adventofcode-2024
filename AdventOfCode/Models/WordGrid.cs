@@ -77,13 +77,13 @@ internal class WordGrid
 		//	Most searches will fail due to:
 		//		* co-ordinates being "out of bounds"
 		//		* the location not containing the correct character
-		for (int i = 0; i < _rowCount; i++)
-			for (var j = 0; j < _columnCount; j++)
+		for (int y = 0; y < _rowCount; y++)
+			for (var x = 0; x < _columnCount; x++)
 			{
 				foreach (var direction in directions)
 				{
-					if (IsPhraseAtCoord(i, j, direction, word))
-						gridResults.Add(new WordGridResult(i, j, direction));
+					if (IsPhraseAtCoord(x, y, direction, word))
+						gridResults.Add(new WordGridResult(x, y, direction));
 				}
 			}
 
@@ -116,7 +116,7 @@ internal class WordGrid
 	/// fewer characters until all characters have been found in the given
 	/// direction of travel.
 	/// </remarks>
-	private bool IsPhraseAtCoord(int row, int column, WordGridDirection direction, string phrase)
+	private bool IsPhraseAtCoord(int column, int row, WordGridDirection direction, string phrase)
 	{
 		//	Get the character at position row,column and compare to first
 		var charAtCoord = _grid[row][column];
@@ -135,6 +135,18 @@ internal class WordGrid
 			return false;
 
 		//	Continue to search at next co-ordinate, using same direction and one character less in the phrase
-		return IsPhraseAtCoord(newRow, newColumn, direction, phrase[1..]);
+		return IsPhraseAtCoord(newColumn, newRow, direction, phrase[1..]);
 	}
+
+	#region Public properties to allow access to grid size
+
+	public static int MinRow => 0;
+
+	public int MaxRow => _rowCount;
+
+	public static int MinColumn => 0;
+
+	public int MaxColumn => _columnCount;
+
+	#endregion
 }
