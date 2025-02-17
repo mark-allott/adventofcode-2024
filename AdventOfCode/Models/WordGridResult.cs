@@ -15,29 +15,29 @@ internal class WordGridResult
 	/// <summary>
 	/// The 0-based X-coordinate of the start of the phrase
 	/// </summary>
-	public int XCoord { get; private set; } = -1;
+	public int ColumnNumber { get; private set; } = -1;
 
 	/// <summary>
 	/// The 0-based Y-coordinate of the start of the phrase
 	/// </summary>
-	public int YCoord { get; private set; } = -1;
+	public int RowNumber { get; private set; } = -1;
 
 	#region ctor
 
 	/// <summary>
 	/// Constructor
 	/// </summary>
-	/// <param name="x">The 0-based x-coordinate of the start of the phrase</param>
-	/// <param name="y">The 0-based y-coordinate of the start of the phrase</param>
+	/// <param name="column">The 0-based column-coordinate of the start of the phrase</param>
+	/// <param name="row">The 0-based row-coordinate of the start of the phrase</param>
 	/// <param name="direction">The direction of travel which the solution takes in the grid</param>
-	public WordGridResult(int x, int y, WordGridDirection direction)
+	public WordGridResult(int column, int row, WordGridDirection direction)
 	{
-		ArgumentOutOfRangeException.ThrowIfLessThan(x, 0, nameof(x));
-		ArgumentOutOfRangeException.ThrowIfLessThan(y, 0, nameof(y));
+		ArgumentOutOfRangeException.ThrowIfLessThan(column, 0, nameof(column));
+		ArgumentOutOfRangeException.ThrowIfLessThan(row, 0, nameof(row));
 		ArgumentOutOfRangeException.ThrowIfEqual((int)direction, (int)WordGridDirection.Unknown, nameof(direction));
 
-		XCoord = x;
-		YCoord = y;
+		ColumnNumber = column;
+		RowNumber = row;
 		Direction = direction;
 	}
 
