@@ -18,9 +18,6 @@ public partial class Day05
 		//	Validate code matches expected rules
 		RunPartOneTest();
 
-		//	Reset the rules/pages from test
-		Reset();
-
 		LoadAndReadFile();
 		ReadInputData();
 
@@ -72,6 +69,8 @@ public partial class Day05
 		Debug.Assert(53 == middlePages[1]);
 		Debug.Assert(29 == middlePages[2]);
 
+		//	Be nice and Reset the rules/pages from test
+		Reset();
 		Console.WriteLine($"{nameof(RunPartOneTest)} tests completed");
 	}
 
