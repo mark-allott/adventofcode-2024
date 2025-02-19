@@ -5,7 +5,7 @@ using AdventOfCode.Models;
 namespace AdventOfCode.Challenges;
 
 public partial class Day05
-	: AbstractDailyChallenge, IAutoRegister
+	: AbstractDailyChallenge, IAutoRegister, IPartOneTestable
 {
 	#region Overrides to run part one of challenge
 
@@ -15,9 +15,6 @@ public partial class Day05
 	/// <returns>True if successful</returns>
 	protected override bool PartOne()
 	{
-		//	Validate code matches expected rules
-		RunPartOneTest();
-
 		LoadAndReadFile();
 		ReadInputData();
 
@@ -34,14 +31,13 @@ public partial class Day05
 
 	#endregion
 
-	#region Test Data from challenge
+	#region IPartOneTestable implementation
 
 	/// <summary>
 	/// Using rules from the challenge, run a test to ensure the code matches the rules
 	/// </summary>
-	private void RunPartOneTest()
+	public void PartOneTest()
 	{
-		Console.WriteLine($"Executing tests in {nameof(RunPartOneTest)}");
 		ReadInputData(testData, true);
 		LoadPageOrderingRules(_rawOrderingRules);
 		LoadPagesToProduce(_rawPagesToProduce);
@@ -68,10 +64,6 @@ public partial class Day05
 		Debug.Assert(61 == middlePages[0]);
 		Debug.Assert(53 == middlePages[1]);
 		Debug.Assert(29 == middlePages[2]);
-
-		//	Be nice and Reset the rules/pages from test
-		Reset();
-		Console.WriteLine($"{nameof(RunPartOneTest)} tests completed");
 	}
 
 	/// <summary>
