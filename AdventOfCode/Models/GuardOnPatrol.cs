@@ -130,7 +130,7 @@ internal class GuardOnPatrol
 	/// <param name="future">The new location for the guard</param>
 	/// <param name="direction">The direction the guard is travelling</param>
 	/// <exception cref="ArgumentOutOfRangeException"></exception>
-	private void SetNewLocation((int row, int col) current, (int row, int col) future, GuardDirection direction)
+	private (bool, CellState) SetNewLocation((int row, int col) current, (int row, int col) future, GuardDirection direction)
 	{
 		//	Calculate the offset from current location to next location
 		var (offsetRow, offsetColumn) = GetCellOffset(direction);
@@ -140,11 +140,79 @@ internal class GuardOnPatrol
 		if (offsetRow != rowDelta || offsetColumn != colDelta)
 			throw new ArgumentOutOfRangeException(nameof(direction), $"Cannot move '{direction}' from ({current.row}, {current.col}) to ({future.row}, {future.col})");
 
+		(bool success, CellState newState) = (false, CellState.Unknown);
 		//	Set current position as visited
-		_patrolGrid?.SetCellState(current.row, current.col, CellState.Visited);
+		(success, newState) = _patrolGrid?.SetCellState(current.row, current.col, CellState.Visited) ?? (false, CellState.Unknown);
 
 		//	Set the new position as current if it is valid
 		if (_patrolGrid?.IsLocationValid(future.row, future.col) ?? false)
-			_patrolGrid?.SetCellState(future.row, future.col, CellState.CurrentPosition);
+			(success, newState) = _patrolGrid?.SetCellState(future.row, future.col, CellState.CurrentPosition) ?? (false, CellState.Unknown);
+
+		return (success, newState);
+	}
+
+	/// <summary>
+	/// Detects whether the guard gets stuck in a patrol loop
+	/// </summary>
+	/// <param name="patrolGrid">The grid being patrolled</param>
+	/// <returns></returns>
+	/// <exception cref="NotImplementedException"></exception>
+	/// <exception cref="InvalidOperationException"></exception>
+	public bool PatrolStuckInLoop(GuardPatrolGrid patrolGrid)
+	{
+		ArgumentNullException.ThrowIfNull(patrolGrid, nameof(patrolGrid));
+
+		_patrolGrid = patrolGrid;
+		var canMove = true;
+		var currDirection = patrolGrid.StartDirection;
+		var currRow = patrolGrid.StartRow;
+		var currCol = patrolGrid.StartColumn;
+		var currState = CellState.CurrentPosition;
+
+		while (canMove)
+		{
+			//	Can we move in the current direction?
+			(canMove, currState) = CanMove(currRow, currCol, currDirection);
+
+			//	Yes, so perform the move
+			if (canMove)
+			{
+				var (newRow, newCol) = GetNewLocation(currRow, currCol, currDirection);
+				var (success, newState) = SetNewLocation((currRow, currCol), (newRow, newCol), currDirection);
+
+				if (success)
+				{
+					currRow = newRow;
+					currCol = newCol;
+				}
+
+				if (newState == CellState.StuckInLoop)
+					return true;
+			}
+			//	can't move so check if reason is going out of the grid
+			else if (currState == CellState.OutOfBounds)
+			{
+				patrolGrid.SetCellState(currRow, currCol, CellState.Visited);
+			}
+			//	can't move because something is in the way, so turn to the right
+			else if (currState == CellState.Obstructed)
+			{
+				currDirection = currDirection switch
+				{
+					GuardDirection.North => GuardDirection.East,
+					GuardDirection.East => GuardDirection.South,
+					GuardDirection.South => GuardDirection.West,
+					GuardDirection.West => GuardDirection.North,
+					_ => throw new NotImplementedException()
+				};
+				canMove = true;
+			}
+			else
+			{
+				throw new InvalidOperationException($"Invalid operation encountered at ({currRow}, {currCol}), moving {currDirection} with state {currState}");
+			}
+		}
+
+		return false;
 	}
 }
