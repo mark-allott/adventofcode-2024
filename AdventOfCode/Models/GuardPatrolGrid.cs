@@ -1,3 +1,4 @@
+using System.Text;
 using AdventOfCode.Enums;
 
 namespace AdventOfCode.Models;
@@ -17,6 +18,8 @@ internal class GuardPatrolGrid
 	public (int min, int max) PatrolHeight { get; private set; }
 
 	private readonly List<List<CellState>> _patrolGrid = new List<List<CellState>>();
+
+	private byte[,] _visitCounter = null!;
 
 	#endregion
 
@@ -59,10 +62,13 @@ internal class GuardPatrolGrid
 
 		//	Clear any current contents of the grid
 		_patrolGrid.Clear();
+		_visitCounter = new byte[gridLengths.Count, gridLengths[0]];
 
+		var cellRow = PatrolHeight.min;
 		//	Loop for each row in the grid
 		foreach (var row in input)
 		{
+			var cellCol = PatrolWidth.min;
 			var cellStates = new List<CellState>();
 			//	Loop for each cell in the row
 			foreach (var cell in row.ToCharArray())
@@ -75,11 +81,19 @@ internal class GuardPatrolGrid
 				if (cellState == CellState.CurrentPosition)
 				{
 					StartDirection = ConvertToGuardDirection(cell);
-					StartRow = input.IndexOf(row);
-					StartColumn = row.IndexOf(cell);
+					StartRow = cellRow;
+					StartColumn = cellCol;
 				}
+
+				//	Check if the location is visited
+				if (cellState == CellState.Visited)
+				{
+					_visitCounter[cellRow, cellCol] = 1;
+				}
+				cellCol++;
 			}
 			_patrolGrid.Add(cellStates);
+			cellRow++;
 		}
 	}
 
@@ -107,9 +121,28 @@ internal class GuardPatrolGrid
 	public CellState GetCellState(int row, int column)
 	{
 		//	Validate co-ordinates fall within bounds of grid
-		return IsLocationValid(row, column)
-			? _patrolGrid[row][column]
-			: CellState.OutOfBounds;
+		if (!IsLocationValid(row, column))
+			return CellState.OutOfBounds;
+
+		var visitCount = _visitCounter[row, column];
+		var state = _patrolGrid[row][column];
+
+		return state switch
+		{
+			CellState.Visited => visitCount switch
+			{
+				0 => CellState.Unvisited,
+				1 => state,
+				< 5 => CellState.VisitedAtLeastTwice,
+				_ => CellState.StuckInLoop
+			},
+			CellState.CurrentPosition => visitCount switch
+			{
+				< 5 => CellState.CurrentPosition,
+				_ => CellState.StuckInLoop,
+			},
+			_ => state
+		};
 	}
 
 	/// <summary>
@@ -122,14 +155,20 @@ internal class GuardPatrolGrid
 	/// <remarks>
 	/// If the proposed change can be completed, then the grid shall be updated accordingly
 	/// </remarks>
-	public bool SetCellState(int row, int column, CellState state)
+	public (bool, CellState) SetCellState(int row, int column, CellState state)
 	{
 		var currentState = GetCellState(row, column);
 		var (canChange, newState) = CanChangeState(currentState, state);
 
 		if (canChange)
+		{
 			_patrolGrid[row][column] = newState;
-		return canChange;
+			if (newState == CellState.Visited)
+			{
+				_visitCounter[row, column] = (byte)(1 + _visitCounter[row, column]);
+			}
+		}
+		return (canChange, GetCellState(row, column));
 	}
 
 	/// <summary>
@@ -144,6 +183,26 @@ internal class GuardPatrolGrid
 			count += row.Where(x => x == CellState.Visited).Count();
 		}
 		return count;
+	}
+
+	/// <summary>
+	/// provide a method to allow a new obstruction to be placed at a specific location
+	/// </summary>
+	/// <param name="row">The y-coordinate of the obstruction</param>
+	/// <param name="column">The x-coordinate of the obstruction</param>
+	/// <returns>True if the placement succeeded, otherwise false</returns>
+	public bool SetNewObstruction(int row, int column)
+	{
+		//	get the current state of the location
+		//	if the location is invalid, we will see OutOfBounds
+		var currentState = GetCellState(row, column);
+
+		//	We can only set a position as an obstruction if it hasn't been visited
+		if (currentState != CellState.Unvisited)
+			return false;
+
+		_patrolGrid[row][column] = CellState.Obstructed;
+		return GetCellState(row, column) == CellState.Obstructed;
 	}
 
 	#endregion
@@ -211,7 +270,9 @@ internal class GuardPatrolGrid
 			//	OutOfBounds can only ever remain as such
 			CellState.OutOfBounds => new[] { CellState.OutOfBounds },
 			//	Visited can only stay visited
-			CellState.Visited => new[] { CellState.Visited },
+			CellState.Visited => new[] { CellState.CurrentPosition, CellState.Visited, CellState.VisitedAtLeastTwice },
+			CellState.VisitedAtLeastTwice => new[] { CellState.CurrentPosition, CellState.Visited, CellState.VisitedAtLeastTwice, CellState.StuckInLoop },
+			CellState.StuckInLoop => new[] { CellState.CurrentPosition, CellState.Visited, CellState.StuckInLoop },
 			_ => throw new ArgumentOutOfRangeException(nameof(currentState)),
 		};
 
@@ -219,14 +280,54 @@ internal class GuardPatrolGrid
 		var canChange = allowedStates.Contains(newState);
 
 		//	Set the value of the valid state to be returned
-		newState = canChange
+		var changedState = canChange
 			? allowedStates.Length == 1
 				? allowedStates[0]
 				: newState
 			: currentState;
 
-		return (canChange, newState);
+		return (canChange, changedState);
+	}
+
+	/// <summary>
+	/// Converts the <paramref name="state"/> into a corresponding character for display
+	/// </summary>
+	/// <param name="state">The <see cref="CellState"/> to convert</param>
+	/// <returns>The character equivalent for <paramref name="state"/></returns>
+	private static char CellStateToChar(CellState state)
+	{
+		return state switch
+		{
+			CellState.Unvisited => '.',
+			CellState.Obstructed => '#',
+			CellState.CurrentPosition => 'C',
+			CellState.Visited => 'X',
+			CellState.VisitedAtLeastTwice => '2',
+			CellState.StuckInLoop => 'S',
+			_ => '?'
+		};
 	}
 
 	#endregion
+
+	/// <summary>
+	/// allows printing out of the current state of the grid to see how it is progressing
+	/// </summary>
+	/// <returns></returns>
+	public override string ToString()
+	{
+		var sb = new StringBuilder();
+		sb.AppendLine();
+
+		for (var row = PatrolHeight.min; row <= PatrolHeight.max; row++)
+		{
+			for (var col = PatrolWidth.min; col <= PatrolWidth.max; col++)
+			{
+				sb.Append(CellStateToChar(GetCellState(row, col)));
+			}
+			sb.AppendLine();
+		}
+
+		return sb.ToString();
+	}
 }
