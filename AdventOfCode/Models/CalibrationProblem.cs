@@ -53,6 +53,7 @@ internal class CalibrationProblem
 		{
 			CalibrationOperator.Add => a + _b,
 			CalibrationOperator.Multiply => a * _b,
+			CalibrationOperator.Concatenate => long.Parse($"{a}{_b}"),
 			_ => 0
 		};
 	}
@@ -81,6 +82,7 @@ internal class CalibrationProblem
 				CalibrationOperator.Multiply => '*',
 				CalibrationOperator.Subtract => '-',
 				CalibrationOperator.Divide => '/',
+				CalibrationOperator.Concatenate => "||",
 				_ => '?'
 			})
 			.Append(' ')
