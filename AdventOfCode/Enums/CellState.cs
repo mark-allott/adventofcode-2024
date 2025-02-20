@@ -8,4 +8,6 @@ internal enum CellState
 	CurrentPosition,
 	OutOfBounds,
 	Visited,
+	VisitedAtLeastTwice,
+	StuckInLoop
 }
