@@ -7,4 +7,5 @@ internal enum CalibrationOperator
 	Multiply,
 	Subtract,
 	Divide,
+	Concatenate,
 }
