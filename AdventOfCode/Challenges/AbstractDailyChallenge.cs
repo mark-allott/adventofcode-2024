@@ -39,6 +39,7 @@ public abstract class AbstractDailyChallenge
 	{
 		try
 		{
+			ExecuteTests();
 			var result1 = ExecutePartOne();
 			var result2 = ExecutePartTwo();
 			return result1 && result2;
@@ -99,6 +100,41 @@ public abstract class AbstractDailyChallenge
 	protected virtual bool PartTwo()
 	{
 		throw new NotImplementedException($"{nameof(ExecutePartTwo)} is not implemented");
+	}
+
+	/// <summary>
+	/// If the class is testable (by decorating with IPartOneTestable, IPartTwoTestable or ITestable), run those tests
+	/// </summary>
+	private void ExecuteTests()
+	{
+		var isPartOneTestable = this.GetType()
+			.GetInterfaces()
+			.Any(x => x.IsAssignableFrom(typeof(IPartOneTestable)));
+		var isPartTwoTestable = this.GetType()
+			.GetInterfaces()
+			.Any(x => x.IsAssignableFrom(typeof(IPartTwoTestable)));
+
+		var isResettable = this.GetType()
+			.GetInterfaces()
+			.Any(x => x.IsAssignableFrom(typeof(IResettable)));
+
+		if (isPartOneTestable)
+		{
+			Console.WriteLine($"Executing tests in {nameof(IPartOneTestable.PartOneTest)}");
+			((IPartOneTestable)this).PartOneTest();
+			if (isResettable)
+				((IResettable)this).Reset();
+			Console.WriteLine($"{nameof(IPartOneTestable.PartOneTest)} tests completed");
+		}
+
+		if (isPartTwoTestable)
+		{
+			Console.WriteLine($"Executing tests in {nameof(IPartTwoTestable.PartTwoTest)}");
+			((IPartTwoTestable)this).PartTwoTest();
+			if (isResettable)
+				((IResettable)this).Reset();
+			Console.WriteLine($"{nameof(IPartTwoTestable.PartTwoTest)} tests completed");
+		}
 	}
 
 	#endregion

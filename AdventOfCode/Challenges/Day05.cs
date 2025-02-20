@@ -5,7 +5,7 @@ using AdventOfCode.Models;
 namespace AdventOfCode.Challenges;
 
 public partial class Day05
-	: AbstractDailyChallenge, IAutoRegister
+	: AbstractDailyChallenge, IAutoRegister, IResettable
 {
 	#region Overrides of AbstractDailyChallenge
 
@@ -103,15 +103,21 @@ public partial class Day05
 		}
 	}
 
+	#region IResettable implementation
+
 	/// <summary>
 	/// Resets the datasets to allow processing of a different set of rules
 	/// </summary>
-	private void Reset()
+	public void Reset()
 	{
+		Console.WriteLine($"Executing {nameof(Day05)}.{nameof(Reset)}");
 		_pageOrderingRules?.Clear();
 		_pagesToProduce?.Clear();
 		_rawOrderingRules?.Clear();
 		_rawPagesToProduce?.Clear();
 		InputFileLines?.Clear();
+		Console.WriteLine($"{nameof(Day05)}.{nameof(Reset)} completed");
 	}
+
+	#endregion
 }
