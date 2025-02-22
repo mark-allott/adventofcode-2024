@@ -40,6 +40,7 @@ internal class Antinode
 	/// </summary>
 	/// <param name="broadcast">The broadcast antenna</param>
 	/// <param name="paired">The antenna paired with the <paramref name="broadcast"/></param>
+	/// <param name="bounds">The upper bounds of the map</param>
 	public Antinode(Antenna broadcast, Antenna paired, (int row, int column) bounds)
 	{
 		ArgumentNullException.ThrowIfNull(broadcast, nameof(broadcast));
@@ -54,6 +55,31 @@ internal class Antinode
 
 		Row = broadcast.Coordinate.row + (2 * offsetRow);
 		Column = broadcast.Coordinate.col + (2 * offsetColumn);
+		_bounds = bounds;
+	}
+
+	/// <summary>
+	/// Alternate ctor allowing for explicit definition of location
+	/// </summary>
+	/// <param name="broadcast">The broadcast antenna</param>
+	/// <param name="paired">The antenna paired with the <paramref name="broadcast"/></param>
+	/// <param name="row">The y-coordintate of the antinode</param>
+	/// <param name="column">The x-coordinate of the antinode</param>
+	/// <param name="bounds">The upper bounds of map</param>
+	public Antinode(Antenna broadcast, Antenna paired, int row, int column, (int row, int column) bounds)
+	{
+		ArgumentNullException.ThrowIfNull(broadcast, nameof(broadcast));
+		ArgumentNullException.ThrowIfNull(paired, nameof(paired));
+		ArgumentOutOfRangeException.ThrowIfEqual(broadcast, paired, nameof(paired));
+		ArgumentOutOfRangeException.ThrowIfNegative(row, nameof(row));
+		ArgumentOutOfRangeException.ThrowIfNegative(column, nameof(column));
+		ArgumentOutOfRangeException.ThrowIfNegative(bounds.row, nameof(bounds.row));
+		ArgumentOutOfRangeException.ThrowIfNegative(bounds.column, nameof(bounds.column));
+
+		BroadcastAntenna = broadcast;
+		PairedAntenna = paired;
+		Row = row;
+		Column = column;
 		_bounds = bounds;
 	}
 
