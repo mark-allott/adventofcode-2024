@@ -9,7 +9,7 @@ internal class DiskBlock
 	/// <summary>
 	/// Holds the blocks used and their index number
 	/// </summary>
-	private List<int> _indexes = new List<int>();
+	private int?[] _fileBlocks = null!;
 
 	/// <summary>
 	/// Holds the amount of space available in the block
@@ -28,9 +28,6 @@ internal class DiskBlock
 
 		//	The first character of the initialiser is the number of entries in the block
 		var usedBlocks = int.Parse(initialiser[0..1]);
-		//	Assign the value of the index to the entries
-		for (var i = 0; i < usedBlocks; i++)
-			_indexes.Add(index);
 
 		//	Calculate the amount of additional free space using the 2nd character (if present)
 		var freeSpace = initialiser.Length > 1
@@ -38,7 +35,12 @@ internal class DiskBlock
 			: 0;
 
 		//	calculate the total number of elements in this block
-		_totalSpace = _indexes.Count + freeSpace;
+		_totalSpace = usedBlocks + freeSpace;
+
+		//	Allocate block memory
+		_fileBlocks = new int?[_totalSpace];
+		for (var i = 0; i < usedBlocks; i++)
+			_fileBlocks[i] = index;
 	}
 
 	/// <summary>
@@ -52,30 +54,31 @@ internal class DiskBlock
 	public override string ToString()
 	{
 		var sb = new StringBuilder();
-		foreach (var index in _indexes)
+		for (var i = 0; i < _totalSpace; i++)
 		{
-			char c = index switch
+			var block = _fileBlocks[i];
+			char c = block switch
 			{
-				< 10 => (char)((int)'0' + index),
-				< 36 => (char)((int)'A' + index - 10),
-				< 62 => (char)((int)'a' + index - 10),
+				null => '.',
+				< 10 => (char)((int)'0' + block),
+				< 36 => (char)((int)'A' + block - 10),
+				< 62 => (char)((int)'a' + block - 36),
 				_ => '?'
 			};
 			sb.Append(c);
 		}
-		sb.Append(new string('.', _totalSpace - _indexes.Count));
 		return sb.ToString();
 	}
 
 	/// <summary>
 	/// Helper property to determine if all entries have been allocated
 	/// </summary>
-	public bool IsFull => _indexes.Count == _totalSpace;
+	public bool IsFull => _fileBlocks.All(q => q.HasValue);
 
 	/// <summary>
 	/// Helper property to determine if any blocks are currently being used
 	/// </summary>
-	public bool IsEmpty => _indexes.Count == 0;
+	public bool IsEmpty => _fileBlocks.All(q => !q.HasValue);
 
 	/// <summary>
 	/// Helper method to exchange the last non-empty item in the list of this
@@ -86,22 +89,30 @@ internal class DiskBlock
 	/// <exception cref="ArgumentException"></exception>
 	public bool MoveTo(DiskBlock other)
 	{
-		var startCount = _indexes.Count;
 		//	Check the other valid is a valid location to move into
 		ArgumentNullException.ThrowIfNull(other);
 		if (other.IsFull)
 			throw new ArgumentException("Cannot move into a full block", nameof(other));
+
 		//	Check this block has something to move
 		if (IsEmpty)
 			throw new ArgumentException("Cannot move anything from an empty block", nameof(IsEmpty));
 
-		//	Grab the last index
-		var swap = _indexes.LastOrDefault(int.MinValue);
-		Debug.Assert(swap != int.MinValue);
+		//	locate the block to move
+		for (var i = _totalSpace; i > 0; i--)
+		{
+			var blockIndex = _fileBlocks[i - 1];
 
-		if (other.Add(swap))
-			_indexes.RemoveAt(_indexes.Count - 1);
-		return startCount == 1 + _indexes.Count;
+			if (!blockIndex.HasValue)
+				continue;
+
+			if (other.Add(blockIndex.Value))
+			{
+				_fileBlocks[i - 1] = null;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/// <summary>
@@ -116,8 +127,14 @@ internal class DiskBlock
 		if (IsFull)
 			return false;
 
-		_indexes.Add(index);
-		return true;
+		for (var i = 0; i < _totalSpace; i++)
+		{
+			if (_fileBlocks[i].HasValue)
+				continue;
+			_fileBlocks[i] = index;
+			return true;
+		}
+		return false;
 	}
 
 	/// <summary>
@@ -133,9 +150,11 @@ internal class DiskBlock
 
 		var checksum = 0L;
 		var offset = 0;
-		foreach (var i in _indexes)
+		foreach (var i in _fileBlocks)
 		{
-			checksum += i * (startPosition + offset);
+			checksum += i.HasValue
+				? i.Value * (startPosition + offset)
+				: 0;
 			offset++;
 		}
 		return (startPosition + _totalSpace, checksum);
@@ -147,8 +166,8 @@ internal class DiskBlock
 	{
 		return other is not null &&
 			_totalSpace == other._totalSpace &&
-			_indexes.Count == other._indexes.Count &&
-			_indexes.SequenceEqual(other._indexes);
+			_fileBlocks.Length == other._fileBlocks.Length &&
+			_fileBlocks.SequenceEqual(other._fileBlocks);
 	}
 
 	#endregion
