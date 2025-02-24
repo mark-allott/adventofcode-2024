@@ -146,7 +146,7 @@ public partial class Day09
 	/// <summary>
 	/// Helper method that performs the compacting of the disk, as per the specification
 	/// </summary>
-	/// <param name="blocks">The lst of <see cref="DiskBlock"/> objects to be compacted</param>
+	/// <param name="blocks">The list of <see cref="DiskBlock"/> objects to be compacted</param>
 	/// <returns>The blocks in their compacted state</returns>
 	private List<DiskBlock> CompactDiskMap(List<DiskBlock> blocks)
 	{
