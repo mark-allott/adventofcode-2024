@@ -3,7 +3,7 @@ using System.Text;
 using AdventOfCode.Interfaces;
 using AdventOfCode.Models;
 
-namespace AdventOfCode.Challenges;
+namespace AdventOfCode.Challenges.Day09;
 
 public partial class Day09
 	: AbstractDailyChallenge, IAutoRegister, IPartTwoTestable

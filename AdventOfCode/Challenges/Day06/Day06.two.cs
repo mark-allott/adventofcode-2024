@@ -3,7 +3,7 @@ using AdventOfCode.Enums;
 using AdventOfCode.Interfaces;
 using AdventOfCode.Models;
 
-namespace AdventOfCode.Challenges;
+namespace AdventOfCode.Challenges.Day06;
 
 public partial class Day06
 	: AbstractDailyChallenge, IAutoRegister, IPartTwoTestable

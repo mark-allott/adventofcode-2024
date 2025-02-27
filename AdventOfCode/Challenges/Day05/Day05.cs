@@ -2,7 +2,7 @@ using AdventOfCode.Extensions;
 using AdventOfCode.Interfaces;
 using AdventOfCode.Models;
 
-namespace AdventOfCode.Challenges;
+namespace AdventOfCode.Challenges.Day05;
 
 public partial class Day05
 	: AbstractDailyChallenge, IAutoRegister, IResettable

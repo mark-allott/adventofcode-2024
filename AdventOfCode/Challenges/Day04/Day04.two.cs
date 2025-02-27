@@ -2,7 +2,7 @@ using AdventOfCode.Enums;
 using AdventOfCode.Interfaces;
 using AdventOfCode.Models;
 
-namespace AdventOfCode.Challenges;
+namespace AdventOfCode.Challenges.Day04;
 
 public partial class Day04
 	: AbstractDailyChallenge, IAutoRegister

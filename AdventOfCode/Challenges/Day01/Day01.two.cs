@@ -1,6 +1,6 @@
 using AdventOfCode.Interfaces;
 
-namespace AdventOfCode.Challenges;
+namespace AdventOfCode.Challenges.Day01;
 
 public partial class Day01
 	: AbstractDailyChallenge, IAutoRegister

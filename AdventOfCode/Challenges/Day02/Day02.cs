@@ -1,14 +1,14 @@
 using AdventOfCode.Interfaces;
 
-namespace AdventOfCode.Challenges;
+namespace AdventOfCode.Challenges.Day02;
 
-public partial class Day08
+public partial class Day02
 	: AbstractDailyChallenge, IAutoRegister
 {
 	#region Overrides of AbstractDailyChallenge
 
-	public Day08()
-		: base(8, "day08-input.txt")
+	public Day02()
+		: base(2, "day02-input.txt")
 	{
 	}
 

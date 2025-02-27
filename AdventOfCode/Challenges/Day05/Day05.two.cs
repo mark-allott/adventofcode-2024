@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using AdventOfCode.Interfaces;
 
-namespace AdventOfCode.Challenges;
+namespace AdventOfCode.Challenges.Day05;
 
 public partial class Day05
 	: AbstractDailyChallenge, IAutoRegister, IPartTwoTestable
