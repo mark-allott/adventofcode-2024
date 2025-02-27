@@ -26,7 +26,7 @@ public partial class Day09
 			var checksum = CalculateDiskMapChecksum(compacted);
 			total += checksum;
 		}
-		PartOneResult = $"Checksum = {total}";
+		PartOneResult = $"Disk checksum = {total}";
 		return true;
 	}
 
@@ -110,6 +110,8 @@ public partial class Day09
 
 		//	The first file entry has index zero, and increments for each block
 		var index = 0;
+		var offset = 0;
+
 		do
 		{
 			//	Get the current block descriptor
@@ -118,13 +120,15 @@ public partial class Day09
 				: map[0..1];
 
 			//	Add it to the container
-			blocks.Add(new DiskBlock(index, current));
+			var newBlock = new DiskBlock(index, current, offset);
+			blocks.Add(newBlock);
 
 			//	re-assign the map to remove the block descriptor at the front
 			map = map.Length > 2
 				? map[2..]
 				: string.Empty;
 			index++;
+			offset += newBlock.BlockLength;
 		}
 		while (map.Length > 0);
 		return blocks;
@@ -183,13 +187,11 @@ public partial class Day09
 	{
 		//	Explicitly specify as long values
 		var checksum = 0L;
-		var startPosition = 0L;
 
 		//	Calculate the checksum for the block, incrementing to overall checksum
 		foreach (var block in blocks)
 		{
-			var (newStartPosition, blockChecksum) = block.CalculateChecksum(startPosition);
-			startPosition = newStartPosition;
+			var blockChecksum = block.CalculateChecksum();
 			checksum += blockChecksum;
 		}
 		return checksum;
