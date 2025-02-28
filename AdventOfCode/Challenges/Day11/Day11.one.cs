@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using AdventOfCode.Extensions;
 using AdventOfCode.Interfaces;
 using AdventOfCode.Models;
 
@@ -18,7 +17,9 @@ public partial class Day11
 	{
 		LoadAndReadFile();
 
-		long total = 0;
+		var pebbleLine = new PlutonianPebbleLine(InputFileLines[0]);
+		pebbleLine.Blink(25);
+		long total = pebbleLine.PebbleCount;
 		PartOneResult = $"Number of pebbles = {total}";
 		return true;
 	}
@@ -32,6 +33,34 @@ public partial class Day11
 	/// </summary>
 	public void PartOneTest()
 	{
+		Debug.Assert(DoTest(_partOneTestInput1, 1, _partOneTestInput1AfterBlink));
+		Debug.Assert(DoTest(_partOneTestInput2, 6, _partOneTestInput2AfterBlink));
+
+		var pebbleLine = new PlutonianPebbleLine(_partOneTestInput2);
+		pebbleLine.Blink(25);
+		Debug.Assert(55312 == pebbleLine.PebbleCount);
+	}
+
+	private bool DoTest(string input, int iterations, List<string> expected)
+	{
+		var pebbleLine = new PlutonianPebbleLine(input);
+
+		if (iterations == expected.Count)
+		{
+			for (int i = 0; i < iterations; i++)
+			{
+				pebbleLine.Blink();
+				if (expected[i] != pebbleLine.ToString())
+					return false;
+			}
+			return true;
+		}
+		else if (expected.Count == 1)
+		{
+			pebbleLine.Blink(iterations);
+			return expected[0] == pebbleLine.ToString();
+		}
+		return false;
 	}
 
 	/// <summary>
