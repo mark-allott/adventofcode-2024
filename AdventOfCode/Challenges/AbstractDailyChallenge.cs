@@ -56,7 +56,16 @@ public abstract class AbstractDailyChallenge
 	{
 		try
 		{
-			return PartOne();
+			var sw = Stopwatch.StartNew();
+			try
+			{
+				return PartOne();
+			}
+			finally
+			{
+				sw.Stop();
+				PartOneResult = $"{PartOneResult} ({sw.Elapsed.Ticks} Ticks)";
+			}
 		}
 		catch (Exception e)
 		{
@@ -74,7 +83,6 @@ public abstract class AbstractDailyChallenge
 	protected virtual bool PartOne()
 	{
 		throw new NotImplementedException($"{nameof(ExecutePartOne)} is not implemented");
-
 	}
 
 	/// <inheritdoc/>
@@ -82,7 +90,16 @@ public abstract class AbstractDailyChallenge
 	{
 		try
 		{
-			return PartTwo();
+			var sw = Stopwatch.StartNew();
+			try
+			{
+				return PartTwo();
+			}
+			finally
+			{
+				sw.Stop();
+				PartTwoResult = $"{PartTwoResult} ({sw.Elapsed.Ticks} Ticks)";
+			}
 		}
 		catch (Exception e)
 		{
@@ -118,22 +135,28 @@ public abstract class AbstractDailyChallenge
 			.GetInterfaces()
 			.Any(x => x.IsAssignableFrom(typeof(IResettable)));
 
+		var sw = new Stopwatch();
 		if (isPartOneTestable)
 		{
 			Console.WriteLine($"Executing tests in {nameof(IPartOneTestable.PartOneTest)}");
+			sw.Start();
 			((IPartOneTestable)this).PartOneTest();
+			sw.Stop();
 			if (isResettable)
 				((IResettable)this).Reset();
-			Console.WriteLine($"{nameof(IPartOneTestable.PartOneTest)} tests completed");
+			Console.WriteLine($"{nameof(IPartOneTestable.PartOneTest)} tests completed ({sw.Elapsed.Ticks} Ticks)");
 		}
 
 		if (isPartTwoTestable)
 		{
+			sw.Reset();
 			Console.WriteLine($"Executing tests in {nameof(IPartTwoTestable.PartTwoTest)}");
+			sw.Start();
 			((IPartTwoTestable)this).PartTwoTest();
+			sw.Stop();
 			if (isResettable)
 				((IResettable)this).Reset();
-			Console.WriteLine($"{nameof(IPartTwoTestable.PartTwoTest)} tests completed");
+			Console.WriteLine($"{nameof(IPartTwoTestable.PartTwoTest)} tests completed ({sw.Elapsed.Ticks} Ticks)");
 		}
 	}
 
