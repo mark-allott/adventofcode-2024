@@ -190,7 +190,7 @@ internal class TopographicMap
 			return false;
 
 		//	If any position is out of bounds this won't be valid
-		if (!route.Route.Any(q => !q.InBounds(_maxRow, _maxCol)))
+		if (route.Route.Any(q => !q.InBounds(_maxRow, _maxCol)))
 			return false;
 
 		//	Get a list of heights from the locations
