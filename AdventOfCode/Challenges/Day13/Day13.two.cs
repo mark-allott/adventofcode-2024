@@ -1,12 +1,10 @@
-using System.Diagnostics;
 using AdventOfCode.Interfaces;
 using AdventOfCode.Models;
 
 namespace AdventOfCode.Challenges.Day13;
 
-/*
 public partial class Day13
-	: AbstractDailyChallenge, IAutoRegister, IPartTwoTestable
+	: AbstractDailyChallenge, IAutoRegister
 {
 	#region Overrides to run part two of challenge
 
@@ -19,22 +17,19 @@ public partial class Day13
 		LoadAndReadFile();
 
 		long total = 0;
-		PartOneResult = $"Number of tokens = {total}";
+		var contraptions = GetContraptionDetail(InputFileLines);
+
+		for (var i = 0; i < contraptions.Count; i++)
+		{
+			var (a, b, p) = contraptions[i];
+			var solver = new ClawContraptionSolver(a, b, p);
+			solver.CorrectPrizeLocation();
+			if (solver.Solve())
+				total += solver.GetCost(3, 1);
+		}
+		PartTwoResult = $"Number of tokens = {total}";
 		return true;
 	}
 
 	#endregion
-
-	#region Test data for part two
-
-	/// <summary>
-	/// Using rules set out in the challenge, run some tests to make sure the
-	/// code behaves as expected
-	/// </summary>
-	public void PartTwoTest()
-	{
-	}
-
-	#endregion
 }
-*/
