@@ -46,7 +46,7 @@ internal partial class ClawContraptionSolver
 	/// <summary>
 	/// Holds the coordinates for the prize
 	/// </summary>
-	private readonly (int x, int y) _prize;
+	private (long x, long y) _prize;
 
 	#endregion
 
@@ -60,12 +60,12 @@ internal partial class ClawContraptionSolver
 	/// <summary>
 	/// Holds the calculated value for A after a call to <see cref="Solve"/> has been made
 	/// </summary>
-	public int ValueForA { get; private set; } = -1;
+	public long ValueForA { get; private set; } = -1;
 
 	/// <summary>
 	/// Holds the calculated value for B after a call to <see cref="Solve"/> has been made
 	/// </summary>
-	public int ValueForB { get; private set; } = -1;
+	public long ValueForB { get; private set; } = -1;
 
 	#endregion
 
@@ -135,8 +135,8 @@ internal partial class ClawContraptionSolver
 		//	Normalising, we then have:
 		//	67(94A + 22B) = 67 * 8400 and
 		//	22(34A + 67B) = 22 * 5400
-		(int a, int b, int c) normalise1 = (_buttonB.y * _buttonA.x, _buttonB.y * _buttonB.x, _buttonB.y * _prize.x);
-		(int a, int b, int c) normalise2 = (_buttonB.x * _buttonA.y, _buttonB.x * _buttonB.y, _buttonB.x * _prize.y);
+		(long a, long b, long c) normalise1 = (_buttonB.y * _buttonA.x, _buttonB.y * _buttonB.x, _buttonB.y * _prize.x);
+		(long a, long b, long c) normalise2 = (_buttonB.x * _buttonA.y, _buttonB.x * _buttonB.y, _buttonB.x * _prize.y);
 
 		//	This should result in the following:
 		//	6298A + 1474B = 562800 and
@@ -144,7 +144,7 @@ internal partial class ClawContraptionSolver
 		//	The above should result in the negation of the B term, so we can do a quick assertion to make sure they are equal before we discard
 		Debug.Assert(normalise1.b == normalise2.b);
 
-		(int n, int v) valueForA = (normalise1.a - normalise2.a, normalise1.c - normalise2.c);
+		(long n, long v) valueForA = (normalise1.a - normalise2.a, normalise1.c - normalise2.c);
 
 		//	Now we reverse the calculation to find the value for b:
 		//	Normalising for B this time, we get:
@@ -160,7 +160,7 @@ internal partial class ClawContraptionSolver
 		Debug.Assert(normalise1.a == normalise2.a);
 
 		//	Get the value for B
-		(int n, int v) valueForB = (normalise2.b - normalise1.b, normalise2.c - normalise1.c);
+		(long n, long v) valueForB = (normalise2.b - normalise1.b, normalise2.c - normalise1.c);
 
 		//	Set the values for A and B properties
 		//	If the values turned negative above, this should correct it
@@ -181,12 +181,20 @@ internal partial class ClawContraptionSolver
 	/// <param name="tokensForA">How many tokens a move for A costs</param>
 	/// <param name="tokensForB">How many tokens a move for B costs</param>
 	/// <returns></returns>
-	public int GetCost(int tokensForA, int tokensForB)
+	public long GetCost(int tokensForA, int tokensForB)
 	{
 		return IsSolveable
 			? (tokensForA * ValueForA) + (tokensForB * ValueForB)
 			: 0;
 	}
 
+	/// <summary>
+	/// Adds the offset of 10000000000000 to the prize locations
+	/// </summary>
+	public void CorrectPrizeLocation()
+	{
+		_prize.x += 10000000000000;
+		_prize.y += 10000000000000;
+	}
 	#endregion
 }
