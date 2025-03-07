@@ -21,4 +21,22 @@ internal static class EnumExtensions
 			_ => throw new ArgumentOutOfRangeException(nameof(c))
 		};
 	}
+
+	/// <summary>
+	/// Helper top convert the values on the map to cell types
+	/// </summary>
+	/// <param name="c">The character to transpose</param>
+	/// <returns>The type of cell</returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public static WarehouseWoeCellType ToWarehouseWoeCellType(this char c)
+	{
+		return c switch
+		{
+			'.' => WarehouseWoeCellType.Empty,
+			'#' => WarehouseWoeCellType.Wall,
+			'O' => WarehouseWoeCellType.Box,
+			'@' => WarehouseWoeCellType.Robot,
+			_ => throw new ArgumentOutOfRangeException(nameof(c))
+		};
+	}
 }
