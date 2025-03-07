@@ -2,7 +2,7 @@ using AdventOfCode.Interfaces;
 using AdventOfCode.Models;
 
 namespace AdventOfCode.Challenges.Day14;
-/*
+
 public partial class Day14
 	: AbstractDailyChallenge, IAutoRegister
 {
@@ -16,11 +16,18 @@ public partial class Day14
 	{
 		LoadAndReadFile();
 
-		long total = 0;
-		PartTwoResult = $"Safety Factor = {total}";
+		var grid = new SecurityBotGrid(101, 103);
+		foreach (var line in InputFileLines)
+		{
+			var (x, y, dx, dy) = GetCoords(line);
+			grid.AddBot(x, y, dx, dy);
+		}
+
+		long total = grid.ElapsedUntilEasterEgg(4);
+		grid.WriteResultToFile();
+		PartTwoResult = $"Easter egg found after {total} moves";
 		return true;
 	}
 
 	#endregion
 }
-*/
