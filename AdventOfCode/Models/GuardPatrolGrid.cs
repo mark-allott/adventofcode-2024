@@ -7,7 +7,7 @@ internal class GuardPatrolGrid
 {
 	#region Fields
 
-	public GuardDirection StartDirection { get; private set; }
+	public DirectionOfTravel StartDirection { get; private set; }
 
 	public int StartRow { get; private set; }
 
@@ -28,7 +28,7 @@ internal class GuardPatrolGrid
 	public GuardPatrolGrid()
 	{
 		//	Initialise current direction of travel and location as "not known"
-		StartDirection = GuardDirection.Unknown;
+		StartDirection = DirectionOfTravel.Unknown;
 		StartRow = -1;
 		StartColumn = -1;
 		PatrolWidth = (0, 0);
@@ -231,19 +231,19 @@ internal class GuardPatrolGrid
 	}
 
 	/// <summary>
-	/// Converts the character representation of the guards current location to a <see cref="GuardDirection"/>
+	/// Converts the character representation of the guards current location to a <see cref="DirectionOfTravel"/>
 	/// </summary>
 	/// <param name="cell">The character to transpose</param>
 	/// <returns>The direction of travel for the guard</returns>
 	/// <exception cref="ArgumentOutOfRangeException"></exception>
-	private GuardDirection ConvertToGuardDirection(char cell)
+	private DirectionOfTravel ConvertToGuardDirection(char cell)
 	{
 		return cell switch
 		{
-			'^' => GuardDirection.North,
-			'>' => GuardDirection.East,
-			'v' => GuardDirection.South,
-			'<' => GuardDirection.West,
+			'^' => DirectionOfTravel.North,
+			'>' => DirectionOfTravel.East,
+			'v' => DirectionOfTravel.South,
+			'<' => DirectionOfTravel.West,
 			_ => throw new ArgumentOutOfRangeException(nameof(cell))
 		};
 	}
