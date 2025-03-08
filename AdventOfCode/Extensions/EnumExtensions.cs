@@ -1,3 +1,4 @@
+using System.Numerics;
 using AdventOfCode.Enums;
 
 namespace AdventOfCode.Extensions;
@@ -23,6 +24,24 @@ internal static class EnumExtensions
 	}
 
 	/// <summary>
+	/// Convert a direction of travel into a movement vector
+	/// </summary>
+	/// <param name="direction">The direction of travel</param>
+	/// <returns>The vector offset for movements</returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public static Vector2 ToMovementOffset(this DirectionOfTravel direction)
+	{
+		return direction switch
+		{
+			DirectionOfTravel.North => new Vector2(0, -1),
+			DirectionOfTravel.East => new Vector2(1, 0),
+			DirectionOfTravel.South => new Vector2(0, 1),
+			DirectionOfTravel.West => new Vector2(-1, 0),
+			_ => throw new ArgumentOutOfRangeException(nameof(direction))
+		};
+	}
+
+	/// <summary>
 	/// Helper top convert the values on the map to cell types
 	/// </summary>
 	/// <param name="c">The character to transpose</param>
@@ -37,6 +56,24 @@ internal static class EnumExtensions
 			'O' => WarehouseWoeCellType.Box,
 			'@' => WarehouseWoeCellType.Robot,
 			_ => throw new ArgumentOutOfRangeException(nameof(c))
+		};
+	}
+
+	/// <summary>
+	/// Converts the cell type into a character representation
+	/// </summary>
+	/// <param name="cellType">The cell type</param>
+	/// <returns>The character representing the cell type</returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public static char ToCharacter(this WarehouseWoeCellType cellType)
+	{
+		return cellType switch
+		{
+			WarehouseWoeCellType.Empty => '.',
+			WarehouseWoeCellType.Wall => '#',
+			WarehouseWoeCellType.Box => 'O',
+			WarehouseWoeCellType.Robot => '@',
+			_ => throw new ArgumentOutOfRangeException(nameof(cellType))
 		};
 	}
 }
