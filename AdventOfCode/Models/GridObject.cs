@@ -4,7 +4,7 @@ namespace AdventOfCode.Models;
 
 internal class GridObject<T>
 {
-	public Vector2 Coord { get; }
+	public Vector2 Coord { get; protected set;}
 
 	public T Descriptor { get; } = default!;
 
