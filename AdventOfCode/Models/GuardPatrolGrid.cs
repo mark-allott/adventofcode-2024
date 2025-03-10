@@ -1,5 +1,6 @@
 using System.Text;
 using AdventOfCode.Enums;
+using AdventOfCode.Extensions;
 
 namespace AdventOfCode.Models;
 
@@ -7,7 +8,7 @@ internal class GuardPatrolGrid
 {
 	#region Fields
 
-	public GuardDirection StartDirection { get; private set; }
+	public DirectionOfTravel StartDirection { get; private set; }
 
 	public int StartRow { get; private set; }
 
@@ -28,7 +29,7 @@ internal class GuardPatrolGrid
 	public GuardPatrolGrid()
 	{
 		//	Initialise current direction of travel and location as "not known"
-		StartDirection = GuardDirection.Unknown;
+		StartDirection = DirectionOfTravel.Unknown;
 		StartRow = -1;
 		StartColumn = -1;
 		PatrolWidth = (0, 0);
@@ -80,7 +81,7 @@ internal class GuardPatrolGrid
 				//	If the current cell is the current position, store that location and direction of travel
 				if (cellState == CellState.CurrentPosition)
 				{
-					StartDirection = ConvertToGuardDirection(cell);
+					StartDirection = cell.ToDirectionOfTravel();
 					StartRow = cellRow;
 					StartColumn = cellCol;
 				}
@@ -227,24 +228,6 @@ internal class GuardPatrolGrid
 			'v' => CellState.CurrentPosition,
 			'X' => CellState.Visited,
 			_ => throw new ArgumentOutOfRangeException(nameof(cell), $"Invalid cell found: {cell}")
-		};
-	}
-
-	/// <summary>
-	/// Converts the character representation of the guards current location to a <see cref="GuardDirection"/>
-	/// </summary>
-	/// <param name="cell">The character to transpose</param>
-	/// <returns>The direction of travel for the guard</returns>
-	/// <exception cref="ArgumentOutOfRangeException"></exception>
-	private GuardDirection ConvertToGuardDirection(char cell)
-	{
-		return cell switch
-		{
-			'^' => GuardDirection.North,
-			'>' => GuardDirection.East,
-			'v' => GuardDirection.South,
-			'<' => GuardDirection.West,
-			_ => throw new ArgumentOutOfRangeException(nameof(cell))
 		};
 	}
 

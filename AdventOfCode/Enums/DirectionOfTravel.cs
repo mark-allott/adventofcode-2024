@@ -1,6 +1,6 @@
 namespace AdventOfCode.Enums;
 
-internal enum GuardDirection
+internal enum DirectionOfTravel
 {
 	Unknown = 0,
 	North,

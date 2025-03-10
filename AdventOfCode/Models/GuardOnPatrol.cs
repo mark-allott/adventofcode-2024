@@ -50,10 +50,10 @@ internal class GuardOnPatrol
 			{
 				currDirection = currDirection switch
 				{
-					GuardDirection.North => GuardDirection.East,
-					GuardDirection.East => GuardDirection.South,
-					GuardDirection.South => GuardDirection.West,
-					GuardDirection.West => GuardDirection.North,
+					DirectionOfTravel.North => DirectionOfTravel.East,
+					DirectionOfTravel.East => DirectionOfTravel.South,
+					DirectionOfTravel.South => DirectionOfTravel.West,
+					DirectionOfTravel.West => DirectionOfTravel.North,
 					_ => throw new NotImplementedException()
 				};
 				canMove = true;
@@ -77,14 +77,14 @@ internal class GuardOnPatrol
 	/// check for any obstructions that would require a change of direction to
 	/// proceed with the patrol
 	/// </remarks>
-	private static (int oRow, int oColumn) GetCellOffset(GuardDirection direction)
+	private static (int oRow, int oColumn) GetCellOffset(DirectionOfTravel direction)
 	{
 		var (offsetRow, offsetColumn) = direction switch
 		{
-			GuardDirection.North => (-1, 0),
-			GuardDirection.East => (0, 1),
-			GuardDirection.South => (1, 0),
-			GuardDirection.West => (0, -1),
+			DirectionOfTravel.North => (-1, 0),
+			DirectionOfTravel.East => (0, 1),
+			DirectionOfTravel.South => (1, 0),
+			DirectionOfTravel.West => (0, -1),
 			_ => throw new ArgumentOutOfRangeException(nameof(direction)),
 		};
 
@@ -98,7 +98,7 @@ internal class GuardOnPatrol
 	/// <param name="currCol">The current x-coordinate in the grid</param>
 	/// <param name="direction">The direction in which the guard is to travel</param>
 	/// <returns>The coordinates for the new location</returns>
-	private static (int newRow, int newCol) GetNewLocation(int currRow, int currCol, GuardDirection direction)
+	private static (int newRow, int newCol) GetNewLocation(int currRow, int currCol, DirectionOfTravel direction)
 	{
 		var (rowOffset, colOffset) = GetCellOffset(direction);
 		return (currRow + rowOffset, currCol + colOffset);
@@ -114,7 +114,7 @@ internal class GuardOnPatrol
 	/// <param name="currCol">the current x-coordinate of the guard in the grid</param>
 	/// <param name="direction">The planned direction of travel</param>
 	/// <returns>True if the move can be made, otherwise false and the cell state of the new location</returns>
-	private (bool canMove, CellState cellState) CanMove(int currRow, int currCol, GuardDirection direction)
+	private (bool canMove, CellState cellState) CanMove(int currRow, int currCol, DirectionOfTravel direction)
 	{
 		var (newRow, newColumn) = GetNewLocation(currRow, currCol, direction);
 		var newState = _patrolGrid?.GetCellState(newRow, newColumn) ?? CellState.Unknown;
@@ -130,7 +130,7 @@ internal class GuardOnPatrol
 	/// <param name="future">The new location for the guard</param>
 	/// <param name="direction">The direction the guard is travelling</param>
 	/// <exception cref="ArgumentOutOfRangeException"></exception>
-	private (bool, CellState) SetNewLocation((int row, int col) current, (int row, int col) future, GuardDirection direction)
+	private (bool, CellState) SetNewLocation((int row, int col) current, (int row, int col) future, DirectionOfTravel direction)
 	{
 		//	Calculate the offset from current location to next location
 		var (offsetRow, offsetColumn) = GetCellOffset(direction);
@@ -199,10 +199,10 @@ internal class GuardOnPatrol
 			{
 				currDirection = currDirection switch
 				{
-					GuardDirection.North => GuardDirection.East,
-					GuardDirection.East => GuardDirection.South,
-					GuardDirection.South => GuardDirection.West,
-					GuardDirection.West => GuardDirection.North,
+					DirectionOfTravel.North => DirectionOfTravel.East,
+					DirectionOfTravel.East => DirectionOfTravel.South,
+					DirectionOfTravel.South => DirectionOfTravel.West,
+					DirectionOfTravel.West => DirectionOfTravel.North,
 					_ => throw new NotImplementedException()
 				};
 				canMove = true;
