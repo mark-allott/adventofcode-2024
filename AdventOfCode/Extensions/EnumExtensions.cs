@@ -116,4 +116,54 @@ internal static class EnumExtensions
 			_ => throw new ArgumentOutOfRangeException(nameof(cellType))
 		};
 	}
+
+	/// <summary>
+	/// Converts a <see cref="ReindeerMazeMove"/> and <see cref="DirectionOfTravel"/> into a new direction
+	/// </summary>
+	/// <param name="move">The move to be made</param>
+	/// <param name="currentDirection">The current direction of travel</param>
+	/// <returns>The new direction of travel after executing the move</returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public static DirectionOfTravel ToDirectionOfTravel(this ReindeerMazeMove move, DirectionOfTravel currentDirection)
+	{
+		return move switch
+		{
+			ReindeerMazeMove.Forward => currentDirection,
+			ReindeerMazeMove.TurnLeft => currentDirection switch
+			{
+				DirectionOfTravel.North => DirectionOfTravel.West,
+				DirectionOfTravel.East => DirectionOfTravel.North,
+				DirectionOfTravel.South => DirectionOfTravel.East,
+				DirectionOfTravel.West => DirectionOfTravel.South,
+				_ => throw new ArgumentOutOfRangeException(nameof(currentDirection))
+			},
+			ReindeerMazeMove.TurnRight => currentDirection switch
+			{
+				DirectionOfTravel.North => DirectionOfTravel.East,
+				DirectionOfTravel.East => DirectionOfTravel.South,
+				DirectionOfTravel.South => DirectionOfTravel.West,
+				DirectionOfTravel.West => DirectionOfTravel.South,
+				_ => throw new ArgumentOutOfRangeException(nameof(currentDirection))
+			},
+			_ => throw new ArgumentOutOfRangeException(nameof(move))
+		};
+	}
+
+	/// <summary>
+	/// Converts a <see cref="DirectionOfTravel"/> value into an offset of x and y coords
+	/// </summary>
+	/// <param name="direction">The direction of travel</param>
+	/// <returns>The offset in coords to apply to a <see cref="MapCoord"/> or similar</returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public static (int xOffset, int yOffset) ToMapCoordOffset(this DirectionOfTravel direction)
+	{
+		return direction switch
+		{
+			DirectionOfTravel.North => (0, -1),
+			DirectionOfTravel.East => (1, 0),
+			DirectionOfTravel.South => (0, 1),
+			DirectionOfTravel.West => (-1, 0),
+			_ => throw new ArgumentOutOfRangeException(nameof(direction))
+		};
+	}
 }
