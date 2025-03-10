@@ -11,7 +11,7 @@ internal class WarehouseWoeGridCell
 	/// <summary>
 	/// GPS value is calculated as (X + 100Y)
 	/// </summary>
-	public int GPS => Descriptor == WarehouseWoeCellType.Box
+	public int GPS => Descriptor == WarehouseWoeCellType.Box || Descriptor == WarehouseWoeCellType.BoxLeft
 		? (int)(100 * Coord.Y + Coord.X)
 		: 0;
 
