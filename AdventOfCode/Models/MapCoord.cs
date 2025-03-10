@@ -58,17 +58,32 @@ internal class MapCoord
 	/// <summary>
 	/// Check method that allows the coordinate to be verified as within the bounds of a map
 	/// </summary>
-	/// <param name="maxRow">The maximum row (Y-coord) for the map</param>
-	/// <param name="maxCol">The maximum column (X-coord) for the map</param>
+	/// <param name="maxY">The maximum row (Y-coord) for the map</param>
+	/// <param name="maxX">The maximum column (X-coord) for the map</param>
 	/// <returns>True if within bounds, otherwise false</returns>
 	/// <remarks>
-	/// Both <paramref name="maxRow"/> and <paramref name="maxCol"/> are 1-based
+	/// Both <paramref name="maxY"/> and <paramref name="maxX"/> are 1-based
 	/// indexes, whereas internal coordinates are always 0-based
 	/// </remarks>
-	public bool InBounds(int maxRow, int maxCol)
+	public bool InBounds(int maxY, int maxX)
 	{
 		return X >= 0 && Y >= 0 &&
-			X < maxCol && Y < maxRow;
+			X < maxX && Y < maxY;
+	}
+
+	/// <summary>
+	/// Check method allows the coordinate to be verified as within bounds, expressed by another <see cref="MapCoord"/> object, <paramref name="bounds"/>
+	/// </summary>
+	/// <param name="bounds">The upper bounds of the grid</param>
+	/// <returns>True if within bounds, otherwise false</returns>
+	/// <remarks>
+	/// Both indices of <paramref name="bounds"/> are 1-based
+	/// indexes, whereas internal coordinates are always 0-based
+	/// </remarks>
+	public bool InBounds(MapCoord bounds)
+	{
+		ArgumentNullException.ThrowIfNull(bounds, nameof(bounds));
+		return InBounds(bounds.Y, bounds.X);
 	}
 
 	#endregion
