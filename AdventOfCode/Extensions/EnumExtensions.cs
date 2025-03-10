@@ -80,4 +80,40 @@ internal static class EnumExtensions
 			_ => throw new ArgumentOutOfRangeException(nameof(cellType))
 		};
 	}
+
+	/// <summary>
+	/// Converts a character on the maze map into a <see cref="ReindeerMazeCellType"/>
+	/// </summary>
+	/// <param name="c">The character to transpose</param>
+	/// <returns>The appropriate <see cref="ReindeerMazeCellType"/></returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public static ReindeerMazeCellType ToReindeerMazeCellType(this char c)
+	{
+		return c switch
+		{
+			'.' => ReindeerMazeCellType.Empty,
+			'#' => ReindeerMazeCellType.Wall,
+			'S' => ReindeerMazeCellType.Start,
+			'E' => ReindeerMazeCellType.End,
+			_ => throw new ArgumentOutOfRangeException(nameof(c))
+		};
+	}
+
+	/// <summary>
+	/// Converts the <paramref name="cellType"/> value into a character representation
+	/// </summary>
+	/// <param name="cellType">The value to transpose</param>
+	/// <returns>The character that represents <paramref name="cellType"/></returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public static char ToCharacter(this ReindeerMazeCellType cellType)
+	{
+		return cellType switch
+		{
+			ReindeerMazeCellType.Empty => '.',
+			ReindeerMazeCellType.Wall => '#',
+			ReindeerMazeCellType.Start => 'S',
+			ReindeerMazeCellType.End => 'E',
+			_ => throw new ArgumentOutOfRangeException(nameof(cellType))
+		};
+	}
 }
