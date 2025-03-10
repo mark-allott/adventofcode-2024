@@ -10,7 +10,7 @@ public abstract class AbstractDailyChallenge
 {
 	#region ctor
 
-	protected AbstractDailyChallenge(int dayNumber, string filename = "")
+	protected AbstractDailyChallenge(int dayNumber, string filename = "", string title = "")
 	{
 		ArgumentOutOfRangeException.ThrowIfLessThan<int>(dayNumber, 1, nameof(dayNumber));
 		ArgumentOutOfRangeException.ThrowIfGreaterThan<int>(dayNumber, 25, nameof(dayNumber));
@@ -18,6 +18,7 @@ public abstract class AbstractDailyChallenge
 
 		DayNumber = dayNumber;
 		Filename = filename;
+		ChallengeTitle = title;
 		//	Blank out the result strings
 		PartOneResult = PartTwoResult = string.Empty;
 	}
@@ -33,6 +34,8 @@ public abstract class AbstractDailyChallenge
 	public string PartOneResult { get; protected set; }
 
 	public string PartTwoResult { get; protected set; }
+
+	public string ChallengeTitle { get; private set; }
 
 	/// <inheritdoc/>
 	public bool Execute()

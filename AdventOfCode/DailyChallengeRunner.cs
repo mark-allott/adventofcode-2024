@@ -101,7 +101,8 @@ public class DailyChallengeRunner
 		ArgumentNullException.ThrowIfNull(challenge, nameof(challenge));
 
 		//	Write some output to the console stating which challenge is being run
-		Console.WriteLine($"Running challenge for day {challenge.DayNumber}");
+		var title = !string.IsNullOrWhiteSpace(challenge.ChallengeTitle) ? $": {challenge.ChallengeTitle}" : "";
+		Console.WriteLine($"Running challenge for day {challenge.DayNumber}{title}");
 
 		//	Run the challenge, state whether it was completed successfully
 		//	(both part one and part two must be completed successfully to be
