@@ -55,6 +55,8 @@ internal static class EnumExtensions
 			'#' => WarehouseWoeCellType.Wall,
 			'O' => WarehouseWoeCellType.Box,
 			'@' => WarehouseWoeCellType.Robot,
+			'[' => WarehouseWoeCellType.BoxLeft,
+			']' => WarehouseWoeCellType.BoxRight,
 			_ => throw new ArgumentOutOfRangeException(nameof(c))
 		};
 	}
@@ -73,6 +75,8 @@ internal static class EnumExtensions
 			WarehouseWoeCellType.Wall => '#',
 			WarehouseWoeCellType.Box => 'O',
 			WarehouseWoeCellType.Robot => '@',
+			WarehouseWoeCellType.BoxLeft => '[',
+			WarehouseWoeCellType.BoxRight => ']',
 			_ => throw new ArgumentOutOfRangeException(nameof(cellType))
 		};
 	}
