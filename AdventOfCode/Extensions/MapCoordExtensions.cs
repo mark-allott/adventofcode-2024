@@ -26,7 +26,7 @@ internal static class MapCoordExtensions
 	/// <param name="direction">The direction (see <see cref="DirectionOfTravel"/>) the reindeer is travelling</param>
 	/// <param name="maze">The maze in which the reindeer as trying to get from start to end position</param>
 	/// <returns>The list of possible moves</returns>
-	public static List<(ReindeerMazeMove, MapCoord)> ReindeerMoves(this MapCoord current, DirectionOfTravel direction, ReindeerMaze maze)
+	public static List<(ReindeerMazeMove movement, MapCoord location)> ReindeerMoves(this MapCoord current, DirectionOfTravel direction, ReindeerMaze maze)
 	{
 		ArgumentNullException.ThrowIfNull(current, nameof(current));
 		ArgumentOutOfRangeException.ThrowIfEqual((int)direction, (int)DirectionOfTravel.Unknown, nameof(direction));
@@ -34,7 +34,7 @@ internal static class MapCoordExtensions
 
 		var moves = new List<(ReindeerMazeMove, MapCoord)>();
 
-		var movesToCheck = new List<ReindeerMazeMove>() { ReindeerMazeMove.TurnLeft, ReindeerMazeMove.Forward, ReindeerMazeMove.TurnRight };
+		var movesToCheck = new List<ReindeerMazeMove>() { ReindeerMazeMove.Forward, ReindeerMazeMove.TurnLeft, ReindeerMazeMove.TurnRight };
 
 		foreach (var moveToCheck in movesToCheck)
 		{
