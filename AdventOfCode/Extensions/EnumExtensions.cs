@@ -142,7 +142,7 @@ internal static class EnumExtensions
 				DirectionOfTravel.North => DirectionOfTravel.East,
 				DirectionOfTravel.East => DirectionOfTravel.South,
 				DirectionOfTravel.South => DirectionOfTravel.West,
-				DirectionOfTravel.West => DirectionOfTravel.South,
+				DirectionOfTravel.West => DirectionOfTravel.North,
 				_ => throw new ArgumentOutOfRangeException(nameof(currentDirection))
 			},
 			_ => throw new ArgumentOutOfRangeException(nameof(move))
