@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace AdventOfCode.Models;
 
 internal class MapCoord
-	: ICloneable
+	: ICloneable, IEquatable<MapCoord>
 {
 	#region Properties
 
@@ -84,6 +84,22 @@ internal class MapCoord
 	{
 		ArgumentNullException.ThrowIfNull(bounds, nameof(bounds));
 		return InBounds(bounds.Y, bounds.X);
+	}
+
+	#endregion
+
+	#region IEquatable implementation
+
+	/// <summary>
+	/// Provide an equality comparison to determine whether two <see cref="MapCoord"/> objects occupy the same location
+	/// </summary>
+	/// <param name="other">The <see cref="MapCoord"/> to be compared with this object</param>
+	/// <returns>True if both objects have the same coords, otherwise false</returns>
+	public bool Equals(MapCoord? other)
+	{
+		return other is not null &&
+			other.X == X &&
+			other.Y == Y;
 	}
 
 	#endregion
