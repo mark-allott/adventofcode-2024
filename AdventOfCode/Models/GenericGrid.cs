@@ -1,3 +1,6 @@
+using System.Text;
+using AdventOfCode.Interfaces;
+
 namespace AdventOfCode.Models;
 
 internal class GenericGrid<T>
@@ -7,12 +10,17 @@ internal class GenericGrid<T>
 	/// <summary>
 	/// Holds the contents of the grid
 	/// </summary>
-	private T[,] _grid = null!;
+	private readonly T[,] _grid = null!;
 
 	/// <summary>
 	/// Holds the upper bounds of the grid
 	/// </summary>
 	private MapCoord _bounds = null!;
+
+	/// <summary>
+	/// Allows cells to be rendered in a custom manner, rather than using standard ToString calls
+	/// </summary>
+	private readonly ICellRenderer<T> _cellRenderer = null!;
 
 	#endregion
 
@@ -58,7 +66,7 @@ internal class GenericGrid<T>
 	/// </summary>
 	/// <param name="x">The number of x-coords/columns in the grid</param>
 	/// <param name="y">The number of y-coords/rows in the grid</param>
-	public GenericGrid(int x, int y)
+	public GenericGrid(int x, int y, ICellRenderer<T> cellRenderer = null!)
 	{
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(x, nameof(x));
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(y, nameof(y));
@@ -67,14 +75,15 @@ internal class GenericGrid<T>
 		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(x * y, 100000, $"{nameof(x)} * {nameof(y)} exceeds storage");
 		_bounds = new MapCoord(y, x);
 		_grid = new T[y, x];
+		_cellRenderer = cellRenderer;
 	}
 
 	/// <summary>
 	/// Alternate ctor using a <see cref="MapCoord"/> as the bounds of the grid
 	/// </summary>
 	/// <param name="coord">The <see cref="MapCoord"/> representing the bounds of the grid</param>
-	public GenericGrid(MapCoord coord)
-		: this(coord.Y, coord.X)
+	public GenericGrid(MapCoord coord, ICellRenderer<T> cellRenderer = null!)
+		: this(coord.Y, coord.X, cellRenderer)
 	{ }
 
 	#endregion
@@ -98,6 +107,30 @@ internal class GenericGrid<T>
 		ArgumentOutOfRangeException.ThrowIfNegative(y, nameof(y));
 		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(x, _bounds.X, nameof(x));
 		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(y, _bounds.Y, nameof(y));
+	}
+
+	#endregion
+
+	#region Overrides from base
+
+	/// <summary>
+	/// Returns a text representation of the grid
+	/// </summary>
+	/// <returns>The grid expressed as a string (each row of the grid occupies new line in string)</returns>
+	public override string ToString()
+	{
+		var sb = new StringBuilder();
+
+		for (var y = 0; y < _bounds.Y; y++)
+		{
+			for (var x = 0; x < _bounds.X; x++)
+			{
+				var cell = this[x, y];
+				sb.Append(cell is null ? '?' : _cellRenderer is null ? cell.ToString() : _cellRenderer.ToCharacter(cell));
+			}
+			sb.AppendLine();
+		}
+		return sb.ToString();
 	}
 
 	#endregion
