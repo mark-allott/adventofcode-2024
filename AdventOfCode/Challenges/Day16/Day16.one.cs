@@ -19,11 +19,8 @@ public partial class Day16
 
 		var maze = new ReindeerMaze();
 		maze.Load(InputFileLines);
-		var completed = maze.FindRoutes()
-			.Where(q => q.CompletesMaze)
-			.OrderBy(o => o.Score)
-			.ToList();
-		long total = completed[0].Score;
+		long total = maze.DijkstraSolver();
+		// long total = 0;
 		PartOneResult = $"Reindeer Maze lowest score = {total}";
 		return true;
 	}
@@ -41,14 +38,9 @@ public partial class Day16
 		{
 			var maze = new ReindeerMaze();
 			maze.Load(_partOneTestInput[i]);
-			var routes = maze.FindRoutes();
-			var completed = routes.Where(q => q.CompletesMaze).OrderBy(o => o.Score).ToList();
-			var scores = completed.Select(s => s.Score).ToList();
-			var minScore = scores.Min();
+			var minScore = maze.DijkstraSolver();
 			Debug.Assert(minScore > 0);
 			Debug.Assert(_partOneExpectedScores[i] == minScore);
-			Console.Write(maze.ToString());
-			Console.WriteLine(completed[0].Print());
 		}
 	}
 
