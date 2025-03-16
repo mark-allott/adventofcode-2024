@@ -57,6 +57,11 @@ internal class GenericGrid<T>
 		set => this[coord.X, coord.Y] = value;
 	}
 
+	/// <summary>
+	/// Yields the upper bounds of the grid
+	/// </summary>
+	public MapCoord Bounds => _bounds?.DeepCopy() ?? null!;
+
 	#endregion
 
 	#region ctor
