@@ -1,9 +1,9 @@
 namespace AdventOfCode.Enums;
 
-internal enum ReindeerMazeMove
+internal enum MazeMovement
 {
 	Unknown = 0,
-	Forward = 1,
+	GoForward = 1,
 	TurnLeft = 2,
 	TurnRight = 3,
 }
