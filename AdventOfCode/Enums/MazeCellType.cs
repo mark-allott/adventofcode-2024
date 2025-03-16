@@ -1,6 +1,6 @@
 namespace AdventOfCode.Enums;
 
-internal enum ReindeerMazeCellType
+internal enum MazeCellType
 {
 	Empty = 0,
 	Wall = 1,
