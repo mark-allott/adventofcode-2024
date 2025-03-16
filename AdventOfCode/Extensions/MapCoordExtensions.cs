@@ -26,15 +26,15 @@ internal static class MapCoordExtensions
 	/// <param name="direction">The direction (see <see cref="DirectionOfTravel"/>) the reindeer is travelling</param>
 	/// <param name="maze">The maze in which the reindeer as trying to get from start to end position</param>
 	/// <returns>The list of possible moves</returns>
-	public static List<(ReindeerMazeMove movement, MapCoord location)> ReindeerMoves(this MapCoord current, DirectionOfTravel direction, ReindeerMaze maze)
+	public static List<(MazeMovement action, MapCoord location)> ReindeerMoves(this MapCoord current, DirectionOfTravel direction, ReindeerMaze maze)
 	{
 		ArgumentNullException.ThrowIfNull(current, nameof(current));
 		ArgumentOutOfRangeException.ThrowIfEqual((int)direction, (int)DirectionOfTravel.Unknown, nameof(direction));
 		ArgumentNullException.ThrowIfNull(maze, nameof(maze));
 
-		var moves = new List<(ReindeerMazeMove, MapCoord)>();
+		var moves = new List<(MazeMovement, MapCoord)>();
 
-		var movesToCheck = new List<ReindeerMazeMove>() { ReindeerMazeMove.Forward, ReindeerMazeMove.TurnLeft, ReindeerMazeMove.TurnRight };
+		var movesToCheck = new List<MazeMovement>() { MazeMovement.GoForward, MazeMovement.TurnLeft, MazeMovement.TurnRight };
 
 		foreach (var moveToCheck in movesToCheck)
 		{
@@ -43,7 +43,7 @@ internal static class MapCoordExtensions
 			var newCoord = current.OffsetBy(offset.yOffset, offset.xOffset);
 			var nextCell = maze[newCoord];
 			//	if we don't encounter a wall, return the move and the next possible location to move into
-			if (nextCell != ReindeerMazeCellType.Wall)
+			if (nextCell != MazeCellType.Wall)
 				moves.Add((moveToCheck, newCoord));
 		}
 		return moves;
