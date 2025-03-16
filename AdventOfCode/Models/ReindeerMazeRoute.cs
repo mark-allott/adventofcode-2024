@@ -71,7 +71,7 @@ internal class ReindeerMazeRoute
 		{
 			if (!CompletesMaze)
 				return 0;
-			return _moves.Count(q => q.MazeMove == ReindeerMazeMove.Forward) + 1000 * _moves.Count(q => q.MazeMove == ReindeerMazeMove.TurnLeft || q.MazeMove == ReindeerMazeMove.TurnRight);
+			return _moves.Count(q => q.MazeMove == MazeMovement.GoForward) + 1000 * _moves.Count(q => q.MazeMove == MazeMovement.TurnLeft || q.MazeMove == MazeMovement.TurnRight);
 		}
 	}
 
@@ -79,6 +79,11 @@ internal class ReindeerMazeRoute
 	/// Property accessor to indicate whether the reindeer is still walking in the maze, attempting to find a solution
 	/// </summary>
 	public bool Walking { get; set; } = true;
+
+	/// <summary>
+	/// Property accessor to indicate whether the path results in a loop
+	/// </summary>
+	public bool Looping { get; private set; } = false;
 
 	#endregion
 
@@ -103,7 +108,7 @@ internal class ReindeerMazeRoute
 	public ReindeerMazeRoute(ReindeerMaze maze)
 	{
 		//	Initialise the route with the reindeer in the start position, facing East (as per brief on website)
-		_startingMove = new ReindeerMove(maze.StartLocation, DirectionOfTravel.East, ReindeerMazeMove.Forward);
+		_startingMove = new ReindeerMove(maze.StartLocation, DirectionOfTravel.East, MazeMovement.Unknown);
 		_endLocation = maze.EndLocation;
 		_bounds = maze.Bounds;
 		RouteOrder = _counter++;
@@ -129,27 +134,39 @@ internal class ReindeerMazeRoute
 	public void AddMovement(ReindeerMove move)
 	{
 		ArgumentNullException.ThrowIfNull(move, nameof(move));
-		ArgumentOutOfRangeException.ThrowIfEqual((int)move.MazeMove, (int)ReindeerMazeMove.Unknown, nameof(move));
+
+		if (_moves.Count == 0 &&
+			move.Location.Equals(_startingMove.Location) &&
+			move.MazeMove == MazeMovement.Unknown)
+			return;
+
+		ArgumentOutOfRangeException.ThrowIfEqual((int)move.MazeMove, (int)MazeMovement.Unknown, nameof(move));
 
 		//	If we're already halted, quit now
 		if (!Walking)
 			return;
 
-		//	Only able to continue walking if the reindeer has not been in that location before.
-		//	If a duplicate location is seen, it would suggest the reindeer is walking in circles
-		var previousVisits = _moves.Where(q => q.Location.Equals(move.Location)).ToList();
 		var canMove = true;
-		if (previousVisits.Count > 0)
+		if (move.LoopingMove)
 		{
-			//	If any previous visits and walking forwards, stop walking the route
-			canMove = !(move.MazeMove == ReindeerMazeMove.Forward);
-			//	We can move if there's only one previous visit and we're now turning left/right
-			canMove = canMove &&
-					previousVisits.Count == 1 &&
-					previousVisits[0].MazeMove == ReindeerMazeMove.Forward &&
-					(move.MazeMove == ReindeerMazeMove.TurnLeft || move.MazeMove == ReindeerMazeMove.TurnRight);
+			Looping = true;
 		}
-		Walking = Walking && canMove;
+		else
+		{
+			//	Only able to continue walking if the reindeer has not been in that location before.
+			//	If a duplicate location is seen, it would suggest the reindeer is walking in circles
+			var previousVisits = _moves.Where(q => q.Location.Equals(move.Location)).ToList();
+			if (previousVisits.Count > 0)
+			{
+				//	If any previous visits and walking forwards, stop walking the route
+				canMove = !(move.MazeMove == MazeMovement.GoForward);
+				//	We can move if there's only one previous visit and we're now turning left/right
+				Looping = !(previousVisits.Count == 1 &&
+							previousVisits[0].MazeMove == MazeMovement.GoForward &&
+							(move.MazeMove == MazeMovement.TurnLeft || move.MazeMove == MazeMovement.TurnRight));
+			}
+		}
+		Walking = Walking && !Looping && canMove;
 
 		//	If we are continuing to walk the maze, add the move to the route
 		if (Walking)
@@ -168,7 +185,7 @@ internal class ReindeerMazeRoute
 	/// <returns>The route counter, walking/completed indicators and last move made</returns>
 	public override string ToString()
 	{
-		return $"{RouteOrder}:{(Walking ? "W" : "H")}{(CompletesMaze ? "C" : "N")}:{LastMove}";
+		return $"{RouteOrder}:{(Walking ? "W" : Looping ? "L" : "H")}{(CompletesMaze ? "C" : "N")}:{LastMove}";
 	}
 
 	/// <summary>
@@ -182,7 +199,7 @@ internal class ReindeerMazeRoute
 		foreach (var move in _moves)
 			sb.AppendLine($"{move}");
 		if (CompletesMaze)
-			sb.AppendLine("Completed");
+			sb.AppendLine($"Completed => {Score} points");
 		return sb.ToString();
 	}
 }
