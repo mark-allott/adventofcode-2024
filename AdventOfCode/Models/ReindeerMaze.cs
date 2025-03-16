@@ -1,4 +1,3 @@
-using System.Text;
 using AdventOfCode.Enums;
 using AdventOfCode.Extensions;
 
@@ -11,7 +10,7 @@ internal class ReindeerMaze
 	/// <summary>
 	/// Holds the maze cells
 	/// </summary>
-	private ReindeerMazeCellType[,] _maze = null!;
+	private MazeGrid _maze = null!;
 
 	/// <summary>
 	/// Holds the upper bounds of the maze coordinates
@@ -38,18 +37,10 @@ internal class ReindeerMaze
 	/// <param name="x">The x-Coord of the cell</param>
 	/// <param name="y">The y-Coord of the cell</param>
 	/// <returns>The type occupying the cell</returns>
-	public ReindeerMazeCellType this[int x, int y]
+	public MazeCellType this[int x, int y]
 	{
-		get
-		{
-			ValidateMazeInputs(x, y);
-			return _maze[y, x];
-		}
-		private set
-		{
-			ValidateMazeInputs(x, y);
-			_maze[y, x] = value;
-		}
+		get => _maze[x, y];
+		private set => _maze[x, y] = value;
 	}
 
 	/// <summary>
@@ -57,10 +48,10 @@ internal class ReindeerMaze
 	/// </summary>
 	/// <param name="coord">The location to access</param>
 	/// <returns>The type occupying the cell</returns>
-	public ReindeerMazeCellType this[MapCoord coord]
+	public MazeCellType this[MapCoord coord]
 	{
-		get => this[coord.X, coord.Y];
-		private set => this[coord.X, coord.Y] = value;
+		get => _maze[coord.X, coord.Y];
+		private set => _maze[coord.X, coord.Y] = value;
 	}
 
 	/// <summary>
@@ -94,38 +85,12 @@ internal class ReindeerMaze
 	/// <returns>A textual representation of the maze</returns>
 	public override string ToString()
 	{
-		var sb = new StringBuilder();
-		for (var y = 0; y < _bounds.Y; y++)
-		{
-			for (var x = 0; x < _bounds.X; x++)
-				sb.Append(this[x, y].ToCharacter());
-			sb.AppendLine();
-		}
-		return sb.ToString();
+		return _maze.ToString();
 	}
 
 	#endregion
 
 	#region Methods
-
-	/// <summary>
-	/// Common validation of <paramref name="x"/> and <paramref name="y"/>
-	/// values as well as making sure the maze if initialised etc.
-	/// </summary>
-	/// <param name="x">The maze x-Coord</param>
-	/// <param name="y">The maze y-Coord</param>
-	/// <exception cref="ArgumentNullException"></exception>
-	private void ValidateMazeInputs(int x, int y)
-	{
-		if (_maze is null)
-			throw new ArgumentNullException(nameof(_maze), "Maze is uninitialised");
-		if (_bounds is null)
-			throw new ArgumentNullException(nameof(_bounds), "Maze is not initialised correctly");
-		ArgumentOutOfRangeException.ThrowIfNegative(x, nameof(x));
-		ArgumentOutOfRangeException.ThrowIfNegative(y, nameof(y));
-		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(x, _bounds.X, nameof(x));
-		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(y, _bounds.Y, nameof(y));
-	}
 
 	/// <summary>
 	/// Loads the maze from the specified <paramref name="input"/> values
@@ -141,7 +106,7 @@ internal class ReindeerMaze
 
 		//	Set bounds and initialise maze grid
 		_bounds = new MapCoord(data.Count, data[0].Length);
-		_maze = new ReindeerMazeCellType[_bounds.Y, _bounds.X];
+		_maze = new MazeGrid(_bounds);
 
 		//	Load cell details into the gird
 		for (var y = 0; y < data.Count; y++)
@@ -149,9 +114,9 @@ internal class ReindeerMaze
 			{
 				var cell = data[y][x].ToReindeerMazeCellType();
 				this[x, y] = cell;
-				if (cell == ReindeerMazeCellType.Start)
+				if (cell == MazeCellType.Start)
 					_startLocation = new MapCoord(y, x);
-				if (cell == ReindeerMazeCellType.End)
+				if (cell == MazeCellType.End)
 					_endLocation = new MapCoord(y, x);
 			}
 
@@ -160,115 +125,15 @@ internal class ReindeerMaze
 		ArgumentNullException.ThrowIfNull(_endLocation, nameof(_endLocation));
 	}
 
-	public List<ReindeerMazeRoute> FindRoutes()
+	#region Dijkstra Algorithm
+
+	public int DijkstraSolver()
 	{
-		var routes = new List<ReindeerMazeRoute>()
-		{
-			new ReindeerMazeRoute(this)
-		};
-
-		while (routes.Any(r => r.Walking))
-		{
-			var walkingRoutes = routes.Where(r => r.Walking)
-				.OrderBy(o => o.RouteOrder)
-				.ToList();
-
-			Console.WriteLine($"Total Routes: {routes.Count}; Walking Count: {walkingRoutes.Count}; Completed Count: {routes.Count(r => r.CompletesMaze)}");
-			//	Container for holding newly discovered routes
-			var newRoutes = new List<ReindeerMazeRoute>();
-
-			//	Loop around each route still walking
-			foreach (var route in walkingRoutes)
-			{
-				//	Whilst this route can still move, loop until it can't
-				while (route.Walking)
-				{
-					var lastMovement = route.LastMove;
-
-					//	Calculate possible moves from the last location
-					var moves = lastMovement.Location.ReindeerMoves(lastMovement.Direction, this);
-					List<ReindeerMove> newMoves;
-
-					switch (moves.Count)
-					{
-						//	Blocked on 3 sides, so walked into a dead-end
-						case 0:
-							route.Walking = false;
-							break;
-
-						//	One move only, so execute the move
-						case 1:
-							//	If the only move to make is a turn, this will result in 2 moves; the turn and a forward
-							newMoves = GetReindeerMoves(lastMovement, moves[0]);
-							newMoves.ForEach(m => route.AddMovement(m));
-							break;
-
-						//	More than one move available.
-						default:
-							//	Make the first movement the "default" route to
-							//	be followed; additonal moves will become alternate
-							//	routes that will be followed once the default route
-							//	completes - either by finding the end point or it
-							//	becomes blocked, or starts going in circles
-
-							//	Copy the route taken so far into new route(s)
-							var newRouteDirections = Enumerable.Range(1, moves.Count - 1)
-								.Select(s => new { Index = s, Route = route.Duplicate() })
-								.ToList();
-
-							//	Execute the move on the "default" route
-							newMoves = GetReindeerMoves(lastMovement, moves[0]);
-							newMoves.ForEach(m => route.AddMovement(m));
-
-							//	On the new routes, execute the moves that were located
-							newRouteDirections.ForEach(i =>
-							{
-								newMoves = GetReindeerMoves(lastMovement, moves[i.Index]);
-								newMoves.ForEach(m => i.Route.AddMovement(m));
-							});
-
-							//	Add the newly discovered alternate routes to the new routes container
-							newRoutes.AddRange(newRouteDirections.Select(i => i.Route));
-							break;
-					}
-				}
-			}
-			//	The route has now completed - either found the end-point of the
-			//	maze, got stuck in a dead-end, or started walking in circles.
-			//	Add new routes found to the list of all routes
-			routes.AddRange(newRoutes);
-		}
-		return routes;
+		var solver = new DijkstraMazeSolver(_maze);
+		return solver.Solve(DirectionOfTravel.East);
 	}
 
-	/// <summary>
-	/// Get the moves the reindeer will perform based on the <paramref name="lastMove"/> and <paramref name="newMove"/>
-	/// </summary>
-	/// <param name="lastMove">The last movement the reindeer made</param>
-	/// <param name="newMove">The move the reindeer is about to make</param>
-	/// <returns>One or more moves the reindeer makes to the new location</returns>
-	private List<ReindeerMove> GetReindeerMoves(ReindeerMove lastMove, (ReindeerMazeMove movement, MapCoord location) newMove)
-	{
-		//	A movement forwards is simply one move in the same direction as previously made
-		if (newMove.movement == ReindeerMazeMove.Forward)
-		{
-			return new List<ReindeerMove>()
-			{
-				new ReindeerMove(newMove.location, newMove.movement.ToDirectionOfTravel(lastMove.Direction), ReindeerMazeMove.Forward)
-			};
-		}
-
-		//	Movements involving turns have two components:
-		//		1 - the reindeer stays in the same location and rotates left/right
-		//		2 - the reindeer moves forward into the new location
-		var turningMove = new ReindeerMove(lastMove.Location, lastMove.Direction, newMove.movement);
-		var forwardMove = new ReindeerMove(newMove.location, turningMove.MazeMove.ToDirectionOfTravel(turningMove.Direction), ReindeerMazeMove.Forward);
-		return new List<ReindeerMove>()
-		{
-			turningMove,
-			forwardMove
-		};
-	}
+	#endregion
 
 	#endregion
 }
