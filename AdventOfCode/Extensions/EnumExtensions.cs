@@ -82,19 +82,19 @@ internal static class EnumExtensions
 	}
 
 	/// <summary>
-	/// Converts a character on the maze map into a <see cref="ReindeerMazeCellType"/>
+	/// Converts a character on the maze map into a <see cref="MazeCellType"/>
 	/// </summary>
 	/// <param name="c">The character to transpose</param>
-	/// <returns>The appropriate <see cref="ReindeerMazeCellType"/></returns>
+	/// <returns>The appropriate <see cref="MazeCellType"/></returns>
 	/// <exception cref="ArgumentOutOfRangeException"></exception>
-	public static ReindeerMazeCellType ToReindeerMazeCellType(this char c)
+	public static MazeCellType ToReindeerMazeCellType(this char c)
 	{
 		return c switch
 		{
-			'.' => ReindeerMazeCellType.Empty,
-			'#' => ReindeerMazeCellType.Wall,
-			'S' => ReindeerMazeCellType.Start,
-			'E' => ReindeerMazeCellType.End,
+			'.' => MazeCellType.Empty,
+			'#' => MazeCellType.Wall,
+			'S' => MazeCellType.Start,
+			'E' => MazeCellType.End,
 			_ => throw new ArgumentOutOfRangeException(nameof(c))
 		};
 	}
@@ -105,31 +105,31 @@ internal static class EnumExtensions
 	/// <param name="cellType">The value to transpose</param>
 	/// <returns>The character that represents <paramref name="cellType"/></returns>
 	/// <exception cref="ArgumentOutOfRangeException"></exception>
-	public static char ToCharacter(this ReindeerMazeCellType cellType)
+	public static char ToCharacter(this MazeCellType cellType)
 	{
 		return cellType switch
 		{
-			ReindeerMazeCellType.Empty => '.',
-			ReindeerMazeCellType.Wall => '#',
-			ReindeerMazeCellType.Start => 'S',
-			ReindeerMazeCellType.End => 'E',
+			MazeCellType.Empty => '.',
+			MazeCellType.Wall => '#',
+			MazeCellType.Start => 'S',
+			MazeCellType.End => 'E',
 			_ => throw new ArgumentOutOfRangeException(nameof(cellType))
 		};
 	}
 
 	/// <summary>
-	/// Converts a <see cref="ReindeerMazeMove"/> and <see cref="DirectionOfTravel"/> into a new direction
+	/// Converts a <see cref="MazeMovement"/> and <see cref="DirectionOfTravel"/> into a new direction
 	/// </summary>
 	/// <param name="move">The move to be made</param>
 	/// <param name="currentDirection">The current direction of travel</param>
 	/// <returns>The new direction of travel after executing the move</returns>
 	/// <exception cref="ArgumentOutOfRangeException"></exception>
-	public static DirectionOfTravel ToDirectionOfTravel(this ReindeerMazeMove move, DirectionOfTravel currentDirection)
+	public static DirectionOfTravel ToDirectionOfTravel(this MazeMovement move, DirectionOfTravel currentDirection)
 	{
 		return move switch
 		{
-			ReindeerMazeMove.Forward => currentDirection,
-			ReindeerMazeMove.TurnLeft => currentDirection switch
+			MazeMovement.GoForward => currentDirection,
+			MazeMovement.TurnLeft => currentDirection switch
 			{
 				DirectionOfTravel.North => DirectionOfTravel.West,
 				DirectionOfTravel.East => DirectionOfTravel.North,
@@ -137,7 +137,7 @@ internal static class EnumExtensions
 				DirectionOfTravel.West => DirectionOfTravel.South,
 				_ => throw new ArgumentOutOfRangeException(nameof(currentDirection))
 			},
-			ReindeerMazeMove.TurnRight => currentDirection switch
+			MazeMovement.TurnRight => currentDirection switch
 			{
 				DirectionOfTravel.North => DirectionOfTravel.East,
 				DirectionOfTravel.East => DirectionOfTravel.South,
