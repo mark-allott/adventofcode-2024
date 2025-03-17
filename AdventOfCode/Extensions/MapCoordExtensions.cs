@@ -18,6 +18,17 @@ internal static class MapCoordExtensions
 	}
 
 	/// <summary>
+	/// Extension method to apply an offset to <paramref name="coord"/>
+	/// </summary>
+	/// <param name="coord">The current coordinate</param>
+	/// <param name="offset">The offset to be applied</param>
+	/// <returns>The new coordinate</returns>
+	public static MapCoord OffsetBy(this MapCoord coord, MapCoord offset)
+	{
+		return new MapCoord(coord.Y + offset.Y, coord.X + offset.X);
+	}
+
+	/// <summary>
 	/// Extension method to return the possible moves for the reindeer from
 	/// <paramref name="current"/> position, moving in <paramref name="direction"/>
 	/// of travel within the specified <paramref name="maze"/>
