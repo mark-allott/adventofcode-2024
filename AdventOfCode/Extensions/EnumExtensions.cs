@@ -37,7 +37,7 @@ internal static class EnumExtensions
 			DirectionOfTravel.East => new Vector2(1, 0),
 			DirectionOfTravel.South => new Vector2(0, 1),
 			DirectionOfTravel.West => new Vector2(-1, 0),
-			_ => throw new ArgumentOutOfRangeException(nameof(direction))
+			_ => throw new ArgumentOutOfRangeException(nameof(direction), direction, $"{nameof(ToMovementOffset)}")
 		};
 	}
 
@@ -163,7 +163,7 @@ internal static class EnumExtensions
 			DirectionOfTravel.East => (1, 0),
 			DirectionOfTravel.South => (0, 1),
 			DirectionOfTravel.West => (-1, 0),
-			_ => throw new ArgumentOutOfRangeException(nameof(direction))
+			_ => throw new ArgumentOutOfRangeException(nameof(direction), direction, $"{nameof(ToMapCoordOffset)}")
 		};
 	}
 }
