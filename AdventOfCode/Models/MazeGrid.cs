@@ -20,6 +20,42 @@ internal class MazeGrid
 	}
 
 	#endregion
+
+	/// <summary>
+	/// Produces a list of <see cref="IMazeNode"/> objects that represent the navigable parts of the maze
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <returns>The list of navigable nodes in the maze, including the start and end positions</returns>
+	public (List<T> allNodes, T startNode, T endNode) GetMazeNodes<T>() where T : IMazeNode, new()
+	{
+		T startNode = default!;
+		T endNode = default!;
+		var allNodes = new List<T>();
+
+		for (var y = 0; y < Bounds.Y; y++)
+			for (var x = 0; x < Bounds.X; x++)
+			{
+				var location = new Coordinate(y, x);
+				switch (this[location])
+				{
+					case MazeCellType.Empty:
+						allNodes.Add(new T() { Location = location, Distance = int.MaxValue });
+						break;
+					case MazeCellType.End:
+						endNode = new T() { Location = location, Distance = int.MaxValue };
+						allNodes.Add(endNode);
+						break;
+					case MazeCellType.Start:
+						startNode = new T() { Location = location, Distance = 0 };
+						allNodes.Add(startNode);
+						break;
+					default:
+						break;
+				}
+			}
+
+		return (allNodes, startNode, endNode);
+	}
 }
 
 internal class MazeCellTypeRenderer
