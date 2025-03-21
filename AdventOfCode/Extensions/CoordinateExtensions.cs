@@ -3,7 +3,7 @@ using AdventOfCode.Models;
 
 namespace AdventOfCode.Extensions;
 
-internal static class MapCoordExtensions
+internal static class CoordinateExtensions
 {
 	/// <summary>
 	/// Extension method to add an offset to an existing coordinate
@@ -12,9 +12,9 @@ internal static class MapCoordExtensions
 	/// <param name="rowOffset">The number of rows to offset by (Y-coords)</param>
 	/// <param name="columnOffset">The number of columns to offset by (X-coords)</param>
 	/// <returns>The updated coordinate</returns>
-	public static MapCoord OffsetBy(this MapCoord coord, int rowOffset, int columnOffset)
+	public static Coordinate OffsetBy(this Coordinate coord, int rowOffset, int columnOffset)
 	{
-		return new MapCoord(coord.Y + rowOffset, coord.X + columnOffset);
+		return new Coordinate(coord.Y + rowOffset, coord.X + columnOffset);
 	}
 
 	/// <summary>
@@ -23,9 +23,9 @@ internal static class MapCoordExtensions
 	/// <param name="coord">The current coordinate</param>
 	/// <param name="offset">The offset to be applied</param>
 	/// <returns>The new coordinate</returns>
-	public static MapCoord OffsetBy(this MapCoord coord, MapCoord offset)
+	public static Coordinate OffsetBy(this Coordinate coord, Coordinate offset)
 	{
-		return new MapCoord(coord.Y + offset.Y, coord.X + offset.X);
+		return new Coordinate(coord.Y + offset.Y, coord.X + offset.X);
 	}
 
 	/// <summary>
@@ -33,17 +33,17 @@ internal static class MapCoordExtensions
 	/// <paramref name="current"/> position, moving in <paramref name="direction"/>
 	/// of travel within the specified <paramref name="maze"/>
 	/// </summary>
-	/// <param name="current">The current position within the maze (expressed as a <see cref="MapCoord"/>)</param>
+	/// <param name="current">The current position within the maze (expressed as a <see cref="Coordinate"/>)</param>
 	/// <param name="direction">The direction (see <see cref="DirectionOfTravel"/>) the reindeer is travelling</param>
 	/// <param name="maze">The maze in which the reindeer as trying to get from start to end position</param>
 	/// <returns>The list of possible moves</returns>
-	public static List<(MazeMovement action, MapCoord location)> ReindeerMoves(this MapCoord current, DirectionOfTravel direction, ReindeerMaze maze)
+	public static List<(MazeMovement action, Coordinate location)> ReindeerMoves(this Coordinate current, DirectionOfTravel direction, ReindeerMaze maze)
 	{
 		ArgumentNullException.ThrowIfNull(current, nameof(current));
 		ArgumentOutOfRangeException.ThrowIfEqual((int)direction, (int)DirectionOfTravel.Unknown, nameof(direction));
 		ArgumentNullException.ThrowIfNull(maze, nameof(maze));
 
-		var moves = new List<(MazeMovement, MapCoord)>();
+		var moves = new List<(MazeMovement, Coordinate)>();
 
 		var movesToCheck = new List<MazeMovement>() { MazeMovement.GoForward, MazeMovement.TurnLeft, MazeMovement.TurnRight };
 
