@@ -15,7 +15,7 @@ internal class GenericGrid<T>
 	/// <summary>
 	/// Holds the upper bounds of the grid
 	/// </summary>
-	private MapCoord _bounds = null!;
+	private Coordinate _bounds = null!;
 
 	/// <summary>
 	/// Allows cells to be rendered in a custom manner, rather than using standard ToString calls
@@ -47,11 +47,11 @@ internal class GenericGrid<T>
 	}
 
 	/// <summary>
-	/// Alternate Indexer accessor, using a <see cref="MapCoord"/> to get/set the cell
+	/// Alternate Indexer accessor, using a <see cref="IGraphCoordinate"/> to get/set the cell
 	/// </summary>
 	/// <param name="coord">The location to access</param>
 	/// <returns>The type occupying the cell</returns>
-	public T this[MapCoord coord]
+	public T this[IGraphCoordinate coord]
 	{
 		get => this[coord.X, coord.Y];
 		set => this[coord.X, coord.Y] = value;
@@ -60,7 +60,7 @@ internal class GenericGrid<T>
 	/// <summary>
 	/// Yields the upper bounds of the grid
 	/// </summary>
-	public MapCoord Bounds => _bounds?.DeepCopy() ?? null!;
+	public Coordinate Bounds => _bounds?.DeepCopy() ?? null!;
 
 	#endregion
 
@@ -78,16 +78,16 @@ internal class GenericGrid<T>
 		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(x, 1000, nameof(x));
 		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(y, 1000, nameof(y));
 		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(x * y, 100000, $"{nameof(x)} * {nameof(y)} exceeds storage");
-		_bounds = new MapCoord(y, x);
+		_bounds = new Coordinate(y, x);
 		_grid = new T[y, x];
 		_cellRenderer = cellRenderer;
 	}
 
 	/// <summary>
-	/// Alternate ctor using a <see cref="MapCoord"/> as the bounds of the grid
+	/// Alternate ctor using a <see cref="Coordinate"/> as the bounds of the grid
 	/// </summary>
-	/// <param name="coord">The <see cref="MapCoord"/> representing the bounds of the grid</param>
-	public GenericGrid(MapCoord coord, ICellRenderer<T> cellRenderer = null!)
+	/// <param name="coord">The <see cref="Coordinate"/> representing the bounds of the grid</param>
+	public GenericGrid(Coordinate coord, ICellRenderer<T> cellRenderer = null!)
 		: this(coord.Y, coord.X, cellRenderer)
 	{ }
 

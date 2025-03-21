@@ -11,7 +11,7 @@ internal class MapRoute
 	/// <summary>
 	/// The list of locations visited on the route
 	/// </summary>
-	private readonly List<MapCoord> _route = new List<MapCoord>();
+	private readonly List<Coordinate> _route = new List<Coordinate>();
 
 	#endregion
 
@@ -20,17 +20,17 @@ internal class MapRoute
 	/// <summary>
 	/// Holds the starting location on the route
 	/// </summary>
-	public MapCoord StartPosition { get; } = null!;
+	public Coordinate StartPosition { get; } = null!;
 
 	/// <summary>
 	/// Provides a readonly list of the coordinates visited
 	/// </summary>
-	public List<MapCoord> Route => _route.AsReadOnly().ToList();
+	public List<Coordinate> Route => _route.AsReadOnly().ToList();
 
 	/// <summary>
 	/// Returns the last position visited on the route
 	/// </summary>
-	public MapCoord LastPosition => _route.LastOrDefault()!;
+	public Coordinate LastPosition => _route.LastOrDefault()!;
 
 	/// <summary>
 	/// Indicates whether the route is in-progress or has completed
@@ -41,7 +41,7 @@ internal class MapRoute
 
 	#region Constructor
 
-	public MapRoute(MapCoord startPosition)
+	public MapRoute(Coordinate startPosition)
 	{
 		ArgumentNullException.ThrowIfNull(startPosition, nameof(startPosition));
 
@@ -99,7 +99,7 @@ internal class MapRoute
 	/// Adds a position to the route being walked (but only if we are walking)
 	/// </summary>
 	/// <param name="coord">The coordinate being added</param>
-	public void Add(MapCoord coord)
+	public void Add(Coordinate coord)
 	{
 		if (Walking)
 			_route.Add(coord);

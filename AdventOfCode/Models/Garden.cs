@@ -70,7 +70,7 @@ internal class Garden
 			var plants = plots[row].ToCharArray();
 			for (var column = 0; column < ColumnCount; column++)
 			{
-				var coord = new MapCoord(row, column);
+				var coord = new Coordinate(row, column);
 				_plots[row, column] = new GardenPlot(coord, plants[column]);
 			}
 		}
@@ -106,7 +106,7 @@ internal class Garden
 				foreach (var (r, c, f) in adjacent)
 				{
 					//	Get the coord to be checked relative to the current plot (up/down/left/right)
-					var coord = new MapCoord(r, c);
+					var coord = new Coordinate(r, c);
 					//	If the coord is out of bounds, or there is a different plant, add the appropriate fence
 					if (!coord.InBounds(RowCount, ColumnCount) || _plots[r, c].Plant != currentPlant)
 						fences |= f;
@@ -154,7 +154,7 @@ internal class Garden
 
 		//	Find adjacent plots within bounds and with same plant
 		var adjacentPlots = plotOffsets
-			.Select(o => new MapCoord(row + o.rowOffset, column + o.colOffset))
+			.Select(o => new Coordinate(row + o.rowOffset, column + o.colOffset))
 			.Where(c => c.InBounds(RowCount, ColumnCount))
 			.Select(c => _plots[c.Y, c.X])
 			.Where(p => p.Plant == plot.Plant)

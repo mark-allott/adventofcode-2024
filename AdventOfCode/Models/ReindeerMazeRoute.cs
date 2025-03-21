@@ -28,12 +28,12 @@ internal class ReindeerMazeRoute
 	/// <summary>
 	/// Holds the location of the end-point of the maze
 	/// </summary>
-	private MapCoord _endLocation = null!;
+	private Coordinate _endLocation = null!;
 
 	/// <summary>
 	/// Holds the boundary of the maze
 	/// </summary>
-	private MapCoord _bounds = null!;
+	private Coordinate _bounds = null!;
 
 	#endregion
 

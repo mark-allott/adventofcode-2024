@@ -10,7 +10,7 @@ internal class BlockedCellGrid
 	{
 	}
 
-	public BlockedCellGrid(MapCoord coords)
+	public BlockedCellGrid(Coordinate coords)
 		: base(coords, new BlockedCellRenderer())
 	{
 	}

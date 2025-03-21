@@ -26,7 +26,7 @@ internal class ReindeerMove
 	/// <summary>
 	/// Holds the location at the end of the move
 	/// </summary>
-	public MapCoord Location { get; } = null!;
+	public Coordinate Location { get; } = null!;
 
 	/// <summary>
 	/// Initial value is not known and should be only used at the start position
@@ -66,7 +66,7 @@ internal class ReindeerMove
 	/// <param name="direction">The direction of travel</param>
 	/// <param name="mazeMove">The type of move being made</param>
 	/// <param name="backwardMove">The move leading to this one</param>
-	public ReindeerMove(MapCoord location, DirectionOfTravel direction, MazeMovement mazeMove)
+	public ReindeerMove(Coordinate location, DirectionOfTravel direction, MazeMovement mazeMove)
 	{
 		ArgumentNullException.ThrowIfNull(location, nameof(location));
 		Location = location;

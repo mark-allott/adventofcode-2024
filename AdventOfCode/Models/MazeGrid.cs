@@ -14,7 +14,7 @@ internal class MazeGrid
 	{
 	}
 
-	public MazeGrid(MapCoord coords)
+	public MazeGrid(Coordinate coords)
 		: base(coords, new MazeCellTypeRenderer())
 	{
 	}

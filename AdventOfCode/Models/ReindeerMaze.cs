@@ -15,17 +15,17 @@ internal class ReindeerMaze
 	/// <summary>
 	/// Holds the upper bounds of the maze coordinates
 	/// </summary>
-	private MapCoord _bounds = null!;
+	private Coordinate _bounds = null!;
 
 	/// <summary>
 	/// Holds the location of the start point within the maze
 	/// </summary>
-	private MapCoord _startLocation = null!;
+	private Coordinate _startLocation = null!;
 
 	/// <summary>
 	/// Holds the location of the end point in the maze
 	/// </summary>
-	private MapCoord _endLocation = null!;
+	private Coordinate _endLocation = null!;
 
 	#endregion
 
@@ -44,11 +44,11 @@ internal class ReindeerMaze
 	}
 
 	/// <summary>
-	/// Alternate Indexer accessor, using a <see cref="MapCoord"/> to get/set the cell
+	/// Alternate Indexer accessor, using a <see cref="Coordinate"/> to get/set the cell
 	/// </summary>
 	/// <param name="coord">The location to access</param>
 	/// <returns>The type occupying the cell</returns>
-	public MazeCellType this[MapCoord coord]
+	public MazeCellType this[Coordinate coord]
 	{
 		get => _maze[coord.X, coord.Y];
 		private set => _maze[coord.X, coord.Y] = value;
@@ -57,17 +57,17 @@ internal class ReindeerMaze
 	/// <summary>
 	/// Public accessor to the start location coords (returns a cloned version so no hacking the location outside of the maze)
 	/// </summary>
-	public MapCoord StartLocation => _startLocation.DeepCopy();
+	public Coordinate StartLocation => _startLocation.DeepCopy();
 
 	/// <summary>
 	/// Public accessor to the end location coords (returns a cloned version so no hacking the location outside of the maze)
 	/// </summary>
-	public MapCoord EndLocation => _endLocation.DeepCopy();
+	public Coordinate EndLocation => _endLocation.DeepCopy();
 
 	/// <summary>
 	/// Public accessor for the bounds of the maze (returns a cloned version so no hacking the size outside of the maze)
 	/// </summary>
-	public MapCoord Bounds => _bounds.DeepCopy();
+	public Coordinate Bounds => _bounds.DeepCopy();
 
 	#endregion
 
@@ -105,7 +105,7 @@ internal class ReindeerMaze
 			throw new ArgumentOutOfRangeException(nameof(input), "Ragged maze areas are not supported");
 
 		//	Set bounds and initialise maze grid
-		_bounds = new MapCoord(data.Count, data[0].Length);
+		_bounds = new Coordinate(data.Count, data[0].Length);
 		_maze = new MazeGrid(_bounds);
 
 		//	Load cell details into the gird
@@ -115,9 +115,9 @@ internal class ReindeerMaze
 				var cell = data[y][x].ToReindeerMazeCellType();
 				this[x, y] = cell;
 				if (cell == MazeCellType.Start)
-					_startLocation = new MapCoord(y, x);
+					_startLocation = new Coordinate(y, x);
 				if (cell == MazeCellType.End)
-					_endLocation = new MapCoord(y, x);
+					_endLocation = new Coordinate(y, x);
 			}
 
 		//	When leaving there MUST be a start and end location specified
@@ -130,7 +130,13 @@ internal class ReindeerMaze
 	public int DijkstraSolver()
 	{
 		var solver = new DijkstraMazeSolver(_maze);
-		return solver.Solve(DirectionOfTravel.East);
+		return solver.Solve(DirectionOfTravel.East, null!);
+	}
+
+	public int DijkstraPathSolver()
+	{
+		var solver = new DijkstraMazeSolver(_maze);
+		return solver.GetBestPathCellCount(DirectionOfTravel.East);
 	}
 
 	#endregion

@@ -87,11 +87,11 @@ internal class GardenRegion
 	}
 
 	/// <summary>
-	/// Determines whether a specific <see cref="MapCoord"/> is located within this region
+	/// Determines whether a specific <see cref="Coordinate"/> is located within this region
 	/// </summary>
 	/// <param name="coord">The coordinate of the location</param>
 	/// <returns>True if the location is for a plot within this region, otherwise false</returns>
-	public bool InBounds(MapCoord coord)
+	public bool InBounds(Coordinate coord)
 	{
 		return _plots.Any(p => p.Location == coord);
 	}
@@ -124,7 +124,7 @@ internal class GardenRegion
 		public FencePosition Position { get; }
 		public List<int> Locations { get; }
 
-		public FenceLocation(int key, FencePosition position, IEnumerable<MapCoord> locations)
+		public FenceLocation(int key, FencePosition position, IEnumerable<Coordinate> locations)
 		{
 			var horizontalPositions = FencePosition.Top | FencePosition.Bottom;
 			Key = key;
