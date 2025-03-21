@@ -172,7 +172,7 @@ internal class Coordinate
 	#endregion
 }
 
-internal class MapCoordEqualityComparer
+internal class CoordinateEqualityComparer
 	: IEqualityComparer<Coordinate>
 {
 	#region IEqualityComparer implementation
