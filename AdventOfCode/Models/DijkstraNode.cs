@@ -19,7 +19,7 @@ internal class DijkstraNode
 	/// <summary>
 	/// The location in the grid
 	/// </summary>
-	public Coordinate Location { get; } = null!;
+	public Coordinate Location { get; set; } = null!;
 
 	/// <summary>
 	/// The direction of travel for the node
@@ -29,11 +29,19 @@ internal class DijkstraNode
 	/// <summary>
 	/// Explicit implementation for IMazeNode
 	/// </summary>
-	IGraphCoordinate IMazeNode.Location => Location;
+	IGraphCoordinate IMazeNode.Location
+	{
+		get => Location;
+		set => Location = new Coordinate(value);
+	}
 
 	#endregion
 
 	#region Ctor
+
+	public DijkstraNode()
+	{
+	}
 
 	/// <summary>
 	/// ctor - requires the location to be set; other properties can be set later
