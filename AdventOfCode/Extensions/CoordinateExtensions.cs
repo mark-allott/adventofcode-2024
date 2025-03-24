@@ -29,7 +29,7 @@ internal static class CoordinateExtensions
 	}
 
 	/// <summary>
-	/// Extension method to return the possible moves for the reindeer from
+	/// Extension method to return the possible moves from the
 	/// <paramref name="current"/> position, moving in <paramref name="direction"/>
 	/// of travel within the specified <paramref name="maze"/>
 	/// </summary>
@@ -37,7 +37,7 @@ internal static class CoordinateExtensions
 	/// <param name="direction">The direction (see <see cref="DirectionOfTravel"/>) the reindeer is travelling</param>
 	/// <param name="maze">The maze in which the reindeer as trying to get from start to end position</param>
 	/// <returns>The list of possible moves</returns>
-	public static List<(MazeMovement action, Coordinate location)> ReindeerMoves(this Coordinate current, DirectionOfTravel direction, ReindeerMaze maze)
+	public static List<(MazeMovement action, Coordinate location)> PossibleMoves(this Coordinate current, DirectionOfTravel direction, MazeGrid maze)
 	{
 		ArgumentNullException.ThrowIfNull(current, nameof(current));
 		ArgumentOutOfRangeException.ThrowIfEqual((int)direction, (int)DirectionOfTravel.Unknown, nameof(direction));
@@ -52,9 +52,9 @@ internal static class CoordinateExtensions
 			var travelDirection = moveToCheck.ToDirectionOfTravel(direction);
 			var offset = travelDirection.ToMapCoordOffset();
 			var newCoord = current.OffsetBy(offset.yOffset, offset.xOffset);
-			var nextCell = maze[newCoord];
-			//	if we don't encounter a wall, return the move and the next possible location to move into
-			if (nextCell != MazeCellType.Wall)
+			var nextNode = maze[newCoord];
+
+			if (nextNode != MazeCellType.Wall)
 				moves.Add((moveToCheck, newCoord));
 		}
 		return moves;
