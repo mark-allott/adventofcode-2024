@@ -1,3 +1,4 @@
+using AdventOfCode.Comparers;
 using AdventOfCode.Enums;
 using AdventOfCode.Extensions;
 
@@ -129,14 +130,21 @@ internal class ReindeerMaze
 
 	public int DijkstraSolver()
 	{
+		var distanceStrategy = new ReindeerMazeDistanceStrategy();
 		var solver = new DijkstraMazeSolver(_maze);
-		return solver.Solve(DirectionOfTravel.East, null!);
+		return solver.Solve(DirectionOfTravel.East, null!, distanceStrategy);
 	}
 
 	public int DijkstraPathSolver()
 	{
+		var distanceStrategy = new ReindeerMazeDistanceStrategy();
 		var solver = new DijkstraMazeSolver(_maze);
-		return solver.GetBestPathCellCount(DirectionOfTravel.East);
+
+		var paths = solver.SolveMultipleBestPaths(DirectionOfTravel.East, distanceStrategy);
+		var locations = paths.SelectMany(m => m.PathCoordinates)
+			.DistinctBy(d => d, new GraphCoordinateEqualityComparer())
+			.ToList();
+		return locations.Count;
 	}
 
 	#endregion
