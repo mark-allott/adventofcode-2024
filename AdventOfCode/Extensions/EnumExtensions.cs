@@ -166,4 +166,22 @@ internal static class EnumExtensions
 			_ => throw new ArgumentOutOfRangeException(nameof(direction), direction, $"{nameof(ToMapCoordOffset)}")
 		};
 	}
+
+	/// <summary>
+	/// Converts a <see cref="DirectionOfTravel"/> value into an offset of x and y coords in a reverse direction
+	/// </summary>
+	/// <param name="direction">The direction of travel to be reversed</param>
+	/// <returns>The offset in coords to apply to a <see cref="MapCoord"/> or similar</returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public static (int xOffset, int yOffset) ToReverseOffset(this DirectionOfTravel direction)
+	{
+		return direction switch
+		{
+			DirectionOfTravel.North => (0, 1),
+			DirectionOfTravel.East => (-1, 0),
+			DirectionOfTravel.South => (0, -1),
+			DirectionOfTravel.West => (1, 0),
+			_ => throw new ArgumentOutOfRangeException(nameof(direction), direction, $"{nameof(ToMapCoordOffset)}")
+		};
+	}
 }
