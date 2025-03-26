@@ -10,7 +10,7 @@ internal class GardenPlot
 	/// <summary>
 	/// The location of the plot within the overall garden
 	/// </summary>
-	public MapCoord Location { get; }
+	public Coordinate Location { get; }
 
 	/// <summary>
 	/// A representation of the planted item in the plot
@@ -29,7 +29,7 @@ internal class GardenPlot
 
 	#region ctor
 
-	public GardenPlot(MapCoord location, char plant)
+	public GardenPlot(Coordinate location, char plant)
 	{
 		ArgumentNullException.ThrowIfNull(location, nameof(location));
 		Location = location;

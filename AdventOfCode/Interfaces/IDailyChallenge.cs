@@ -32,6 +32,11 @@ public interface IDailyChallenge
 	string Filename { get; }
 
 	/// <summary>
+	/// Holds the title of the daily challenge
+	/// </summary>
+	string ChallengeTitle { get; }
+
+	/// <summary>
 	/// Will hold the solution to part one of the daily challenge
 	/// </summary>
 	string PartOneResult { get; }

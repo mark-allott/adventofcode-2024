@@ -22,12 +22,12 @@ internal class TopographicMap
 	/// <summary>
 	/// Contains a list of starting positions, where the height is zero
 	/// </summary>
-	private List<MapCoord> _startPositions = new List<MapCoord>();
+	private List<Coordinate> _startPositions = new List<Coordinate>();
 
 	/// <summary>
 	/// Public accessor to the start positions as a read-only list
 	/// </summary>
-	public List<MapCoord> StartPositions => _startPositions.AsReadOnly().ToList();
+	public List<Coordinate> StartPositions => _startPositions.AsReadOnly().ToList();
 
 	/// <summary>
 	/// ctor
@@ -76,7 +76,7 @@ internal class TopographicMap
 
 				//	If the height is zero, add to the start positions
 				if (result == 0)
-					_startPositions.Add(new MapCoord(row, column));
+					_startPositions.Add(new Coordinate(row, column));
 			}
 		}
 		return map;
@@ -98,14 +98,14 @@ internal class TopographicMap
 	/// </summary>
 	/// <param name="location">The current location on the map</param>
 	/// <returns>A list of the next possible locations</returns>
-	public List<MapCoord> GetPossibleMovesFrom(MapCoord location)
+	public List<Coordinate> GetPossibleMovesFrom(Coordinate location)
 	{
 		ArgumentOutOfRangeException.ThrowIfNegative(location.Y, nameof(location));
 		ArgumentOutOfRangeException.ThrowIfGreaterThan(location.Y, _maxRow, nameof(location));
 		ArgumentOutOfRangeException.ThrowIfNegative(location.X, nameof(location));
 		ArgumentOutOfRangeException.ThrowIfGreaterThan(location.X, _maxCol, nameof(location));
 
-		var moves = new List<MapCoord>();
+		var moves = new List<Coordinate>();
 
 		//	A valid move will result in a location in any direction where the
 		//	height is one more than the current height
@@ -120,7 +120,7 @@ internal class TopographicMap
 		return moves;
 	}
 
-	public List<MapRoute> FindRoutes(MapCoord start)
+	public List<MapRoute> FindRoutes(Coordinate start)
 	{
 		var routes = new List<MapRoute>()
 		{

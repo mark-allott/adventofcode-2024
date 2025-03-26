@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using AdventOfCode.Comparers;
 using AdventOfCode.Extensions;
 using AdventOfCode.Interfaces;
 using AdventOfCode.Models;
@@ -26,7 +27,7 @@ public partial class Day10
 			var routes = map.FindRoutes(position);
 			var routesToTop = routes.Select(r => map.IsValidRouteToTop(r)).ToList();
 			var distinctEndpoints = routes.Where(q => map.IsValidRouteToTop(q))
-				.DistinctBy(r => r.LastPosition, new MapCoordEqualityComparer())
+				.DistinctBy(r => r.LastPosition, new CoordinateEqualityComparer())
 				.ToList();
 			total += distinctEndpoints.Count;
 		}
@@ -65,7 +66,7 @@ public partial class Day10
 			var routes = map.FindRoutes(position);
 			var routesToTop = routes.Select(r => map.IsValidRouteToTop(r)).ToList();
 			var distinctEndpoints = routes.Where(q => map.IsValidRouteToTop(q))
-				.DistinctBy(r => r.LastPosition, new MapCoordEqualityComparer())
+				.DistinctBy(r => r.LastPosition, new CoordinateEqualityComparer())
 				.ToList();
 			uniqueCounts.Enqueue(distinctEndpoints.Count);
 		}
