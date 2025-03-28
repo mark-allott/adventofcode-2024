@@ -66,12 +66,25 @@ internal class ChronospatialComputer
 		_instructionPointer = 0;
 		_outputs.Clear();
 
-		while (_instructionPointer < _program.Count)
+		try
 		{
-			var opcode = (ChronospatialComputerOpcode)_program[_instructionPointer++];
-			var operand = _program[_instructionPointer++];
-			ExecuteOpcode(opcode, operand);
+			while (_instructionPointer < _program.Count)
+			{
+				var opcode = (ChronospatialComputerOpcode)_program[_instructionPointer++];
+				var operand = _program[_instructionPointer++];
+				ExecuteOpcode(opcode, operand);
+			}
 		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+			_outputs.Clear();
+		}
+	}
+
+	public void ClearOutput()
+	{
+		_outputs.Clear();
 	}
 
 	/// <summary>
