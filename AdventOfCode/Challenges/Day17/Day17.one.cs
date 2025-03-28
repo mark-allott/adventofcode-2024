@@ -80,11 +80,11 @@ public partial class Day17
 
 	#region Methods
 
-	private (int a, int b, int c, string program) ExtractSetup()
+	private (long a, long b, long c, string program) ExtractSetup()
 	{
-		int a = 0;
-		int b = 0;
-		int c = 0;
+		long a = 0;
+		long b = 0;
+		long c = 0;
 		string program = string.Empty;
 
 		foreach (var line in InputFileLines)
