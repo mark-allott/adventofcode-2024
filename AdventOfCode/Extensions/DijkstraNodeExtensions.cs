@@ -29,6 +29,11 @@ internal static class DijkstraNodeExtensions
 			var travelDirection = moveToCheck.ToDirectionOfTravel(node.Direction);
 			var offset = travelDirection.ToMapCoordOffset();
 			var newCoord = node.Location.OffsetBy(offset.yOffset, offset.xOffset);
+
+			//	Only try to check a coordinate that is within bounds of the maze
+			if (!newCoord.InBounds(maze.Bounds))
+				continue;
+
 			var nextCell = maze[newCoord];
 			//	if we encounter a wall, check the next move
 			if (nextCell == MazeCellType.Wall)
