@@ -1,11 +1,10 @@
-using System.Diagnostics;
 using AdventOfCode.Interfaces;
 using AdventOfCode.Models;
 
 namespace AdventOfCode.Challenges.Day19;
 
 public partial class Day19
-	: AbstractDailyChallenge, IAutoRegister, IPartTwoTestable
+	: AbstractDailyChallenge, IAutoRegister
 {
 	#region Overrides to run part two of challenge
 
@@ -17,16 +16,12 @@ public partial class Day19
 	{
 		LoadAndReadFile();
 
-		PartTwoResult = $"{ChallengeTitle} : N/A";
+		var (patterns, designs) = ReadData(InputFileLines);
+		var ll = new LinenLayout(patterns, designs);
+		var goodDesignScores = ll.GetValidDesignScores();
+
+		PartTwoResult = $"{ChallengeTitle} : {goodDesignScores}";
 		return true;
-	}
-
-	#endregion
-
-	#region IPartTwoTestable implementation
-
-	public void PartTwoTest()
-	{
 	}
 
 	#endregion
