@@ -70,5 +70,16 @@ internal class LinenLayout
 		return _lookups[design];
 	}
 
+	/// <summary>
+	/// Determine the total number of combinations of patterns that can be used to generate the designs
+	/// </summary>
+	/// <returns>The total number of combinations that can be used</returns>
+	public long GetValidDesignScores()
+	{
+		return _designs.Select(d => GetDesignScore(d))
+			.Where(d => d > 0)
+			.Sum();
+	}
+
 	#endregion
 }
