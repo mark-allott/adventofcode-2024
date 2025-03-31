@@ -20,7 +20,7 @@ public partial class Day20
 		var maze = new RaceCondition();
 		maze.Load(InputFileLines);
 
-		var results = maze.GetShortcuts();
+		var results = maze.GetShortcuts(2, new CardinalRangeStrategy());
 
 		string output = $"{results.Where(r => r.Key >= 100).Sum(r => r.Value)}";
 		PartOneResult = $"{ChallengeTitle} cheats saving at least 100ps = {output}";
@@ -44,7 +44,7 @@ public partial class Day20
 		Debug.Assert(minScore != int.MaxValue);
 		Debug.Assert(84 == minScore);
 
-		var results = maze.GetShortcuts();
+		var results = maze.GetShortcuts(2, new CardinalRangeStrategy());
 
 		Debug.Assert(results.Count == _partOneExpectedShortcuts.Count);
 		foreach (var shortcut in _partOneExpectedShortcuts)
