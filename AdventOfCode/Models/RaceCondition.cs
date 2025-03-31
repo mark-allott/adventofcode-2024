@@ -1,9 +1,12 @@
-using AdventOfCode.Comparers;
 using AdventOfCode.Enums;
 using AdventOfCode.Extensions;
+using AdventOfCode.Interfaces;
 
 namespace AdventOfCode.Models;
 
+/// <summary>
+/// A class that can be used to calculate the required results for day 20 challenge
+/// </summary>
 internal class RaceCondition
 {
 	#region Fields
@@ -123,9 +126,16 @@ internal class RaceCondition
 	/// <summary>
 	/// Method to locate shortcuts in the maze and return the number found and how much savings they make
 	/// </summary>
+	/// <param name="range">The range within which a node must be located</param>
+	/// <param name="rangeFinder">The delegate method used to locate neighbouring nodes</param>
 	/// <returns>A dictionary of savings found and how many alternate routes have the same saving</returns>
-	public Dictionary<int, int> GetShortcuts()
+	public Dictionary<int, int> GetShortcuts(int range, IGraphCoordinateRangeStrategy rangeFinder)
 	{
+		//	Range must be sensible
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(range, nameof(range));
+		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(range, 10000, nameof(range));
+		ArgumentNullException.ThrowIfNull(rangeFinder, nameof(rangeFinder));
+
 		//	Create the maze, get the nodes and work out the solution
 		var distanceStrategy = new RamRunDistanceStrategy();
 		var solver = new DijkstraMazeSolver(_maze);
@@ -137,11 +147,12 @@ internal class RaceCondition
 
 		foreach (var node in nodesInSolution)
 		{
-			var neighbours = node.NeighboursAtRange(2, nodesInSolution);
+			var neighbours = node.NeighboursInRange(range, rangeFinder, nodesInSolution)
+				.ToList();
 			var shortcuts = neighbours
 				.Where(n => n.Distance > 0)
-				.Where(n => n.Distance - node.Distance > 2)
-				.Select(s => new { StartNode = node, EndNode = s, Saving = s.Distance - node.Distance - 2 })
+				.Where(n => n.Distance - node.Distance > range)
+				.Select(s => new { StartNode = node, EndNode = s, Saving = s.Distance - node.Distance - rangeFinder.Range(node.Location, s.Location) })
 				.ToList();
 
 			shortcuts.ForEach(s =>
