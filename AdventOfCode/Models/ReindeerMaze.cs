@@ -113,7 +113,7 @@ internal class ReindeerMaze
 		for (var y = 0; y < data.Count; y++)
 			for (var x = 0; x < data[y].Length; x++)
 			{
-				var cell = data[y][x].ToReindeerMazeCellType();
+				var cell = data[y][x].ToMazeCellType();
 				this[x, y] = cell;
 				if (cell == MazeCellType.Start)
 					_startLocation = new Coordinate(y, x);
