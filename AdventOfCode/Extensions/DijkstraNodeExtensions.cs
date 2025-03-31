@@ -118,4 +118,29 @@ internal static class DijkstraNodeExtensions
 		return mazeNodes.Where(n => nodeCoords.Contains(n.Location))
 			.ToList();
 	}
+
+	/// <summary>
+	/// Returns a list of nodes from <paramref name="allowedNodes"/> that are
+	/// within the <paramref name="range"/> of <paramref name="node"/>, using
+	/// the <paramref name="rangeStrategy"/> to calculate the range between nodes
+	/// </summary>
+	/// <param name="node">The node requesting neighbours</param>
+	/// <param name="range">The range within which to return neighbours</param>
+	/// <param name="rangeStrategy">The strategy to use to determine range between two nodes</param>
+	/// <param name="allowedNodes">The nodes from which neighbours shall be chosen</param>
+	/// <returns>Nodes that are neighbours for <paramref name="node"/>, within the specified <paramref name="range"/></returns>
+	public static IEnumerable<DijkstraNode> NeighboursInRange(this DijkstraNode node, int range, IGraphCoordinateRangeStrategy rangeStrategy, List<DijkstraNode> allowedNodes)
+	{
+		ArgumentNullException.ThrowIfNull(node, nameof(node));
+		ArgumentNullException.ThrowIfNull(rangeStrategy, nameof(rangeStrategy));
+		ArgumentNullException.ThrowIfNull(allowedNodes, nameof(allowedNodes));
+
+		//	Always convert to +ve range first
+		range = Math.Abs(range);
+
+		return allowedNodes
+			.Where(n => !node.Equals(n))
+			.Where(n => rangeStrategy.Range(node.Location, n.Location) <= range)
+			.ToList();
+	}
 }
