@@ -25,7 +25,7 @@ internal class CardinalRangeStrategy
 
 		//	If both cardinal ranges are greater than zero then there's a diagonal element to the movement
 		if (dX > 0 && dY > 0)
-			throw new ArgumentOutOfRangeException($"Range has more than one direction");
+			return int.MaxValue;
 
 		return dX == 0
 			? dY
