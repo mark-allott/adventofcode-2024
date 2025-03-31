@@ -89,4 +89,33 @@ internal static class DijkstraNodeExtensions
 		}
 		return neighbours;
 	}
+
+	/// <summary>
+	/// Returns a list of <see cref="DijkstraNode"/> neighbours of <paramref name="node"/>, that are within the permitted list of <paramref name="mazeNodes"/>
+	/// </summary>
+	/// <param name="node">The node to find neighbours for</param>
+	/// <param name="range">The range at which a neighbour must appear</param>
+	/// <param name="mazeNodes">The list of permitted nodes in the maze</param>
+	/// <returns>The neighouring nodes</returns>
+	public static List<DijkstraNode> NeighboursAtRange(this DijkstraNode node, int range, List<DijkstraNode> mazeNodes)
+	{
+		ArgumentNullException.ThrowIfNull(node, nameof(node));
+		ArgumentNullException.ThrowIfNull(mazeNodes, nameof(mazeNodes));
+
+		//	Always convert to +ve range first
+		range = Math.Abs(range);
+
+		//	Create a list of coordinates where neighbours are required to be located
+		var nodeCoords = new List<Coordinate>()
+		{
+			node.Location.OffsetBy(0, range),
+			node.Location.OffsetBy(0, -range),
+			node.Location.OffsetBy(range ,0),
+			node.Location.OffsetBy(-range, 0)
+		};
+
+		//	return the list of nodes which occupy the desired locations
+		return mazeNodes.Where(n => nodeCoords.Contains(n.Location))
+			.ToList();
+	}
 }
