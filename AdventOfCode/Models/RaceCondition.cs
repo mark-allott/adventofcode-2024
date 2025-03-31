@@ -1,10 +1,13 @@
-using AdventOfCode.Comparers;
 using AdventOfCode.Enums;
 using AdventOfCode.Extensions;
+using AdventOfCode.Interfaces;
 
 namespace AdventOfCode.Models;
 
-internal class ReindeerMaze
+/// <summary>
+/// A class that can be used to calculate the required results for day 20 challenge
+/// </summary>
+internal class RaceCondition
 {
 	#region Fields
 
@@ -31,7 +34,6 @@ internal class ReindeerMaze
 	#endregion
 
 	#region Properties
-
 	/// <summary>
 	/// Indexer accessor, using separate X and Y coords
 	/// </summary>
@@ -55,27 +57,9 @@ internal class ReindeerMaze
 		private set => _maze[coord.X, coord.Y] = value;
 	}
 
-	/// <summary>
-	/// Public accessor to the start location coords (returns a cloned version so no hacking the location outside of the maze)
-	/// </summary>
-	public Coordinate StartLocation => _startLocation.DeepCopy();
-
-	/// <summary>
-	/// Public accessor to the end location coords (returns a cloned version so no hacking the location outside of the maze)
-	/// </summary>
-	public Coordinate EndLocation => _endLocation.DeepCopy();
-
-	/// <summary>
-	/// Public accessor for the bounds of the maze (returns a cloned version so no hacking the size outside of the maze)
-	/// </summary>
-	public Coordinate Bounds => _bounds.DeepCopy();
-
 	#endregion
 
-	#region ctor
-
-	//	Relies on default ctor - no special case needed
-
+	#region Constructors
 	#endregion
 
 	#region Overrides
@@ -109,7 +93,7 @@ internal class ReindeerMaze
 		_bounds = new Coordinate(data.Count, data[0].Length);
 		_maze = new MazeGrid(_bounds);
 
-		//	Load cell details into the gird
+		//	Load cell details into the grid
 		for (var y = 0; y < data.Count; y++)
 			for (var x = 0; x < data[y].Length; x++)
 			{
@@ -128,23 +112,57 @@ internal class ReindeerMaze
 
 	#region Dijkstra Algorithm
 
+	/// <summary>
+	/// Solves the maze using Dijkstra's algorithm
+	/// </summary>
+	/// <returns>The shortest path solution, or <see cref="int.MaxValue"/> if no solution</returns>
 	public int DijkstraSolver()
 	{
-		var distanceStrategy = new ReindeerMazeDistanceStrategy();
+		var distanceStrategy = new RamRunDistanceStrategy();
 		var solver = new DijkstraMazeSolver(_maze);
 		return solver.Solve(DirectionOfTravel.East, null!, distanceStrategy);
 	}
 
-	public int DijkstraPathSolver()
+	/// <summary>
+	/// Method to locate shortcuts in the maze and return the number found and how much savings they make
+	/// </summary>
+	/// <param name="range">The range within which a node must be located</param>
+	/// <param name="rangeFinder">The delegate method used to locate neighbouring nodes</param>
+	/// <returns>A dictionary of savings found and how many alternate routes have the same saving</returns>
+	public Dictionary<int, int> GetShortcuts(int range, IGraphCoordinateRangeStrategy rangeFinder)
 	{
-		var distanceStrategy = new ReindeerMazeDistanceStrategy();
-		var solver = new DijkstraMazeSolver(_maze);
+		//	Range must be sensible
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(range, nameof(range));
+		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(range, 10000, nameof(range));
+		ArgumentNullException.ThrowIfNull(rangeFinder, nameof(rangeFinder));
 
-		var paths = solver.SolveMultipleBestPaths(DirectionOfTravel.East, distanceStrategy);
-		var locations = paths.SelectMany(m => m.PathCoordinates)
-			.DistinctBy(d => d, new GraphCoordinateEqualityComparer())
-			.ToList();
-		return locations.Count;
+		//	Create the maze, get the nodes and work out the solution
+		var distanceStrategy = new RamRunDistanceStrategy();
+		var solver = new DijkstraMazeSolver(_maze);
+		//	Solve using standard solution first to get all distances populated for nodes
+		var bestStandardPath = solver.Solve(DirectionOfTravel.East, null!, distanceStrategy);
+		var nodesInSolution = solver.GetSolutionNodes();
+
+		var results = new Dictionary<int, int>();
+
+		foreach (var node in nodesInSolution)
+		{
+			var neighbours = node.NeighboursInRange(range, rangeFinder, nodesInSolution)
+				.ToList();
+			var shortcuts = neighbours
+				.Where(n => n.Distance > 0)
+				.Where(n => n.Distance - node.Distance > range)
+				.Select(s => new { StartNode = node, EndNode = s, Saving = s.Distance - node.Distance - rangeFinder.Range(node.Location, s.Location) })
+				.ToList();
+
+			shortcuts.ForEach(s =>
+			{
+				if (!results.TryGetValue(s.Saving, out var count))
+					results[s.Saving] = 0;
+				results[s.Saving] += 1;
+			});
+		}
+		return results;
 	}
 
 	#endregion

@@ -87,7 +87,7 @@ internal static class EnumExtensions
 	/// <param name="c">The character to transpose</param>
 	/// <returns>The appropriate <see cref="MazeCellType"/></returns>
 	/// <exception cref="ArgumentOutOfRangeException"></exception>
-	public static MazeCellType ToReindeerMazeCellType(this char c)
+	public static MazeCellType ToMazeCellType(this char c)
 	{
 		return c switch
 		{

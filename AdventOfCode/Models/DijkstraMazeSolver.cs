@@ -397,5 +397,14 @@ internal class DijkstraMazeSolver
 		return branches;
 	}
 
+	/// <summary>
+	/// Helper method to return the list of nodes which make up the solution to the maze
+	/// </summary>
+	/// <returns>All nodes that are part of the solution (i.e. have distance values that are not <see cref="int.MaxValue"/>)</returns>
+	public List<DijkstraNode> GetSolutionNodes()
+	{
+		return new List<DijkstraNode>(_mazeNodes.Where(n => n.Distance != int.MaxValue).OrderBy(o => o.Distance));
+	}
+
 	#endregion
 }
