@@ -17,8 +17,16 @@ public partial class Day21
 	{
 		LoadAndReadFile();
 
-		string output = $"N/A";
-		PartOneResult = $"{ChallengeTitle} complexity = {output}";
+		var complexityTotal = 0L;
+		var solver = new KeypadConundrum();
+		solver.SetupKeypads(_keypad, _arrowKeys, ' ');
+
+		foreach (var code in InputFileLines)
+		{
+			var (keypresses, complexity) = solver.GetSolution(code, 2);
+			complexityTotal += complexity;
+		}
+		PartOneResult = $"{ChallengeTitle} complexity = {complexityTotal}";
 		return true;
 	}
 
@@ -31,6 +39,22 @@ public partial class Day21
 	/// </summary>
 	public void PartOneTest()
 	{
+		var sut = new KeypadConundrum();
+		sut.SetupKeypads(_keypad, _arrowKeys, ' ');
+
+		foreach (var code in _partOneTestInput)
+		{
+			// (keypresses, complexity) = sut.GetSolution(code, 0);
+			// Console.WriteLine($"{code}/0 => {keypresses}");
+			// (keypresses, complexity) = sut.GetSolution(code, 1);
+			// Console.WriteLine($"{code}/1 => {keypresses}");
+			var (keypresses, complexity) = sut.GetSolution(code, 2);
+			// Console.WriteLine($"{code}/2 => {keypresses}");
+			var expectedKeypresses = _partOneExpectedKeypresses[code];
+			var expectedComplexity = _partOneExpectedComplexities[code];
+			Debug.Assert(keypresses.Length == expectedKeypresses.Length);
+			Debug.Assert(complexity == expectedComplexity);
+		}
 	}
 
 	private List<string> _keypad = new List<string>()
