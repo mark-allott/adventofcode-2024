@@ -1,5 +1,6 @@
 using System.Numerics;
 using AdventOfCode.Enums;
+using AdventOfCode.Models;
 
 namespace AdventOfCode.Extensions;
 
@@ -20,6 +21,24 @@ internal static class EnumExtensions
 			'v' => DirectionOfTravel.South,
 			'<' => DirectionOfTravel.West,
 			_ => throw new ArgumentOutOfRangeException(nameof(c))
+		};
+	}
+
+	/// <summary>
+	/// Converts the <see cref="DirectionOfTravel"/> value into a character equivalent
+	/// </summary>
+	/// <param name="direction">The direction of travel</param>
+	/// <returns>The character representing <paramref name="direction"/></returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public static char ToChar(this DirectionOfTravel direction)
+	{
+		return direction switch
+		{
+			DirectionOfTravel.North => '^',
+			DirectionOfTravel.East => '>',
+			DirectionOfTravel.South => 'v',
+			DirectionOfTravel.West => '<',
+			_ => throw new ArgumentOutOfRangeException(nameof(direction))
 		};
 	}
 
@@ -153,7 +172,7 @@ internal static class EnumExtensions
 	/// Converts a <see cref="DirectionOfTravel"/> value into an offset of x and y coords
 	/// </summary>
 	/// <param name="direction">The direction of travel</param>
-	/// <returns>The offset in coords to apply to a <see cref="MapCoord"/> or similar</returns>
+	/// <returns>The offset in coords to apply to a <see cref="Coordinate"/> or similar</returns>
 	/// <exception cref="ArgumentOutOfRangeException"></exception>
 	public static (int xOffset, int yOffset) ToMapCoordOffset(this DirectionOfTravel direction)
 	{
@@ -168,10 +187,22 @@ internal static class EnumExtensions
 	}
 
 	/// <summary>
+	/// Converts a <see cref="DirectionOfTravel"/> value into an offset coordinate
+	/// </summary>
+	/// <param name="direction">The direction of travel</param>
+	/// <returns>The offset in coords to apply to a <see cref="Coordinate"/> or similar</returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public static Coordinate ToOffset(this DirectionOfTravel direction)
+	{
+		var (xOffset, yOffset) = direction.ToMapCoordOffset();
+		return new Coordinate(yOffset, xOffset);
+	}
+
+	/// <summary>
 	/// Converts a <see cref="DirectionOfTravel"/> value into an offset of x and y coords in a reverse direction
 	/// </summary>
 	/// <param name="direction">The direction of travel to be reversed</param>
-	/// <returns>The offset in coords to apply to a <see cref="MapCoord"/> or similar</returns>
+	/// <returns>The offset in coords to apply to a <see cref="Coordinate"/> or similar</returns>
 	/// <exception cref="ArgumentOutOfRangeException"></exception>
 	public static (int xOffset, int yOffset) ToReverseOffset(this DirectionOfTravel direction)
 	{
@@ -181,7 +212,7 @@ internal static class EnumExtensions
 			DirectionOfTravel.East => (-1, 0),
 			DirectionOfTravel.South => (0, -1),
 			DirectionOfTravel.West => (1, 0),
-			_ => throw new ArgumentOutOfRangeException(nameof(direction), direction, $"{nameof(ToMapCoordOffset)}")
+			_ => throw new ArgumentOutOfRangeException(nameof(direction), direction, $"{nameof(ToReverseOffset)}")
 		};
 	}
 }
