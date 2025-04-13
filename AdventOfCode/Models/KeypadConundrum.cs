@@ -1,5 +1,4 @@
 
-using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using AdventOfCode.Enums;
@@ -61,9 +60,9 @@ internal class KeypadConundrum
 	{
 		//	Set up the keypad dictionary objects
 		_numericKeypad = ParseKeypad(numericKeypad);
-		_numericDirections = GetKeypadDirections(_numericKeypad, invalidCharacters);
+		_numericDirections = GetKeypadDirectionsEx(_numericKeypad, invalidCharacters);
 		_directionalKeypad = ParseKeypad(directionalKeypad);
-		_directionalDirections = GetKeypadDirections(_directionalKeypad, invalidCharacters);
+		_directionalDirections = GetKeypadDirectionsEx(_directionalKeypad, invalidCharacters);
 	}
 
 	/// <summary>
@@ -71,9 +70,7 @@ internal class KeypadConundrum
 	/// </summary>
 	private readonly Dictionary<(string, int, int), string> _lookups = new Dictionary<(string, int, int), string>();
 
-	private readonly Dictionary<(string, int), long> _longLookups = new Dictionary<(string, int), long>();
-
-	private readonly Dictionary<(char, char, int), string> _charLookups = new Dictionary<(char, char, int), string>();
+	private readonly Dictionary<(string, int, int), long> _longLookups = new Dictionary<(string, int, int), long>();
 
 	private char[] _currentKeyPositions = null!;
 
@@ -286,6 +283,180 @@ internal class KeypadConundrum
 			toKeys.TryAdd(key.To.Key, sb.ToString());
 		}
 		return directions;
+	}
+
+	/// <summary>
+	/// Computes the keypresses required and the overall complexity score for the
+	/// <paramref name="code"/> supplied, using the <paramref name="depth"/>
+	/// quantity of intermediate robots
+	/// </summary>
+	/// <param name="code">The code needed on the numeric keypad</param>
+	/// <param name="depth">The number of intermediate robots</param>
+	/// <returns>The keypresses needed and the overall complexity score</returns>
+	/// <exception cref="Exception"></exception>
+	public long GetComplexity(string code, int depth)
+	{
+		_lookups.Clear();
+		_longLookups.Clear();
+		//	All keypads start at the A position
+		_currentKeyPositions = new String('A', depth + 1).ToCharArray();
+
+		var presses = GetKeypressCount(code, 0, depth);
+		if (!int.TryParse(Regex.Replace(code, @"\D", ""), out var result))
+			throw new Exception($"Cannot convert '{code}' to an integer");
+		return presses * result;
+	}
+
+	/// <summary>
+	/// Recursive method to work out the keypresses needed to provide the specified
+	/// <paramref name="code"/> at the <paramref name="depth"/> needed
+	/// </summary>
+	/// <param name="code">The code requiring entry onto the keypad</param>
+	/// <param name="depth">The depth of intermediate robots</param>
+	/// <param name="maxDepth">The maximum depth</param>
+	/// <returns>The keypresses needed to execute <paramref name="code"/></returns>
+	private long GetKeypressCount(string code, int depth, int maxDepth)
+	{
+		//	Does the code exist already?
+		if (_longLookups.TryGetValue((code, depth, maxDepth), out var result))
+			return result;
+
+		var keypad = depth == 0 ? _numericDirections : _directionalDirections;
+
+		try
+		{
+			result = 0L;
+			foreach (var key in code.ToCharArray())
+			{
+				//	Get the position of the robot/human at the specified depth
+				var current = _currentKeyPositions[depth];
+
+				//	Protect ourselves from trying to get bizarre values
+				if (!keypad.TryGetValue(current, out var toKey))
+					throw new Exception($"keypad has no '{current}'");
+
+				if (!toKey.TryGetValue(key, out var keysToPress))
+					throw new Exception("toKey not found");
+
+				//	Store the new position the robot/human is at at the specified depth
+				_currentKeyPositions[depth] = key;
+				//	Append results until the maximum depth has been reached
+				//	Note: "A" is always appended as this causes the robot to execute the selected keypress
+				result += depth == maxDepth
+					? keysToPress.Length + 1
+					: GetKeypressCount(keysToPress + "A", depth + 1, maxDepth);
+			}
+		}
+		catch (System.Exception ex)
+		{
+			Console.WriteLine($"Huh?!? {ex.Message}: [{code}, {depth}, {maxDepth}]");
+			throw;
+		}
+		return _longLookups[(code, depth, maxDepth)] = result;
+	}
+
+	#endregion
+
+	#region Refactoring for part two
+
+	private Dictionary<char, Dictionary<char, string>> GetKeypadDirectionsEx(Dictionary<char, Coordinate> keypad, params char[] blockedCellChars)
+	{
+		//	Determine which values are valid or blocked
+		var allowed = keypad.Where(q => !blockedCellChars.Contains(q.Key)).ToDictionary();
+		var blocked = keypad.Where(q => blockedCellChars.Contains(q.Key)).ToDictionary();
+
+		//	Determine the lists of allowed and blocked coordinates for the keys
+		var allowedCoords = allowed.Select(s => s.Value).ToList();
+		var blockedCoords = blocked.Select(s => s.Value).ToList();
+
+		//	Perform a cartesian join on each allowed key with others
+		var combo = allowed.SelectMany(m => allowed, (f, t) => new { From = f, To = t })
+			.ToList();
+
+		//	Work out the upper bounds for a grid
+		var maxX = Math.Max(allowedCoords.Max(c => c.X), blockedCoords.Max(c => c.X));
+		var maxY = Math.Max(allowedCoords.Max(c => c.Y), blockedCoords.Max(c => c.Y));
+
+		//	Create a lookup for moving from one key to another
+		var directions = new Dictionary<char, Dictionary<char, string>>();
+
+		//	Loop around each combination
+		foreach (var key in combo)
+		{
+			//	Check for previous entry / create a new one
+			if (!directions.TryGetValue(key.From.Key, out var toKeys))
+			{
+				toKeys = new Dictionary<char, string>();
+				directions[key.From.Key] = toKeys;
+			}
+
+			var path = "";
+			//	Only attempt walking the path if the key from/to is NOT identical
+			if (key.From.Key != key.To.Key)
+				path = GetOptimalPath(blockedCoords, 1 + maxX, 1 + maxY, key.From.Value, key.To.Value);
+
+			//	Add the optimal path to the lookup
+			toKeys.TryAdd(key.To.Key, path);
+		}
+
+		return directions;
+	}
+
+	private string GetOptimalPath(List<Coordinate> blocked, int x, int y, Coordinate start, Coordinate end)
+	{
+		//	Create a grid onto which the moves shall be projected
+		var keypadGrid = new MazeGrid(x, y);
+		//	Storage for best paths found for each direction of movement
+		var bestPaths = new List<MazePath<DijkstraNode>>();
+
+		//	Re-use the distance strategy where turning is expensive
+		var movementStrategy = new ReindeerMazeDistanceStrategy();
+
+		foreach (var direction in _directionalPrecedence)
+		{
+			keypadGrid.MakeGridEmpty();
+			blocked.ForEach(c => keypadGrid[c] = MazeCellType.Wall);
+			keypadGrid[start] = MazeCellType.Start;
+			keypadGrid[end] = MazeCellType.End;
+
+			//	Attempt to solve multiple best paths for the "maze"
+			var dijkstraSolver = new DijkstraMazeSolver(keypadGrid);
+			try
+			{
+				//	The best path is the one with the lowest "distance to exit" for the current start direction
+				var bestPath = dijkstraSolver.SolveMultipleBestPaths(direction.Key, movementStrategy)
+					//	Ignore any unsolveable
+					.Where(q => q.DistanceToExit != int.MaxValue)
+					.OrderBy(o => o.DistanceToExit)
+					.FirstOrDefault();
+
+				if (bestPath is not null)
+					bestPaths.Add(bestPath);
+			}
+			catch (NullReferenceException)
+			{
+				Console.WriteLine($"Solver went bang! Params: [{x},{y}], {start}, {end}");
+			}
+		}
+
+		//	Now get the "best of the best"
+		var bestOfBest = bestPaths.OrderBy(o => o.DistanceToExit).FirstOrDefault();
+
+		if (bestOfBest is null)
+			throw new Exception($"No solution for grid");
+
+		var node = bestOfBest.Path.First;
+		var sb = new StringBuilder();
+		while (node is not null)
+		{
+			sb.Append(node.Value.Direction.ToChar());
+			node = node.Next;
+		}
+		var path = sb.ToString();
+		//	Ignore the first node direction from the path - it isn't needed
+		return string.IsNullOrWhiteSpace(path)
+			? path
+			: path[1..];
 	}
 
 	#endregion
