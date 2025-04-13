@@ -56,6 +56,16 @@ internal class MazeGrid
 
 		return (allNodes, startNode, endNode);
 	}
+
+	/// <summary>
+	/// Simple but effective way of ensuring all cells in the grid are empty
+	/// </summary>
+	public void MakeGridEmpty()
+	{
+		for (var y = 0; y < Bounds.Y; y++)
+			for (var x = 0; x < Bounds.X; x++)
+				this[x, y] = MazeCellType.Empty;
+	}
 }
 
 internal class MazeCellTypeRenderer

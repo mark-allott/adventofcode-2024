@@ -153,6 +153,8 @@ internal class Coordinate
 
 	public static Coordinate operator -(Coordinate a, Coordinate b) => new Coordinate(a.Y - b.Y, a.X - b.X);
 
+	public static Coordinate operator *(Coordinate a, int v) => new Coordinate(a.Y * v, a.X * v);
+
 	public static Coordinate OffsetNorth() => new Coordinate(-1, 0);
 
 	public static Coordinate OffsetSouth() => new Coordinate(1, 0);

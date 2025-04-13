@@ -181,12 +181,16 @@ internal class DijkstraMazeSolver
 	/// <returns></returns>
 	public List<MazePath<DijkstraNode>> SolveMultipleBestPaths(DirectionOfTravel initialDirection, IDijkstraDistanceStrategy<MazeMovement> distanceStrategy)
 	{
-		//	Store for results
-		var bestPaths = new List<MazePath<DijkstraNode>>();
-
 		//	What is the best distance solution?
 		//	Force solution to store results in _mazeNodes so they can be re-used
 		var bestDistance = Solve(initialDirection, null!, distanceStrategy);
+
+		if (bestDistance == int.MaxValue)
+			return new List<MazePath<DijkstraNode>>();
+
+		//	Store for results
+		var bestPaths = new List<MazePath<DijkstraNode>>();
+
 		//	Get the path for the best solution
 		var bestPath = GetPath();
 		//	Add to results

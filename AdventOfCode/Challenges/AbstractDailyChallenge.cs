@@ -67,7 +67,7 @@ public abstract class AbstractDailyChallenge
 			finally
 			{
 				sw.Stop();
-				PartOneResult = $"{PartOneResult} ({sw.Elapsed.Ticks} Ticks)";
+				PartOneResult = $"{PartOneResult} ({sw.ElapsedMilliseconds}ms / {sw.Elapsed.Ticks} Ticks)";
 			}
 		}
 		catch (Exception e)
@@ -101,7 +101,7 @@ public abstract class AbstractDailyChallenge
 			finally
 			{
 				sw.Stop();
-				PartTwoResult = $"{PartTwoResult} ({sw.Elapsed.Ticks} Ticks)";
+				PartTwoResult = $"{PartTwoResult} ({sw.ElapsedMilliseconds}ms / {sw.Elapsed.Ticks} Ticks)";
 			}
 		}
 		catch (Exception e)
