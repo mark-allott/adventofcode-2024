@@ -15,8 +15,14 @@ public partial class Day21
 	/// <returns></returns>
 	protected override bool PartTwo()
 	{
-		string output = $"N/A";
-		PartTwoResult = $"{ChallengeTitle} complexity = {output}";
+		var complexityTotal = 0L;
+		var solver = new KeypadConundrum();
+		solver.SetupKeypads(_keypad, _arrowKeys, ' ');
+
+		foreach (var code in InputFileLines)
+			complexityTotal += solver.GetComplexity(code, 25);
+
+		PartTwoResult = $"{ChallengeTitle} complexity = {complexityTotal}";
 		return true;
 	}
 
