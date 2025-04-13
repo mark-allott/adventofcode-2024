@@ -37,10 +37,23 @@ internal class KeypadConundrum
 	/// by South / v. North / ^ and East / &gt; both have equal values. The
 	/// order of precedence we have is therefore West, South, East, North
 	/// </summary>
-	private readonly Dictionary<DirectionOfTravel, int> _directionalPrecedence = Enum.GetValues<DirectionOfTravel>()
-		.Where(d => d != DirectionOfTravel.Unknown)
-		.OrderByDescending(o => o)
-		.Select((d, i) => (d, i))
+	// private readonly Dictionary<DirectionOfTravel, int> _directionalPrecedence = Enum.GetValues<DirectionOfTravel>()
+	// 	.Where(d => d != DirectionOfTravel.Unknown)
+	// 	.OrderByDescending(o => o)
+	// 	.Select((d, i) => (d, i))
+	// 	.ToDictionary(kvp => kvp.d, kvp => kvp.i);
+
+	/// <summary>
+	/// Part One seems unaffected by the above precedence, but part two, with
+	/// the increased depth count results in a higher complexity score than
+	/// expected. Therefore, manually tweak the precedence values to be in the
+	/// order West, South, North, East to see if this results in a change of
+	/// the final complexity score
+	/// </summary>
+	private readonly Dictionary<DirectionOfTravel, int> _directionalPrecedence = new[]
+		{
+			DirectionOfTravel.West, DirectionOfTravel.South, DirectionOfTravel.North, DirectionOfTravel.East
+		}.Select((d, i) => (d, i))
 		.ToDictionary(kvp => kvp.d, kvp => kvp.i);
 
 	#endregion
@@ -402,10 +415,10 @@ internal class KeypadConundrum
 		return directions;
 	}
 
-	private string GetOptimalPath(List<Coordinate> blocked, int x, int y, Coordinate start, Coordinate end)
+	private string GetOptimalPath(List<Coordinate> blocked, int width, int height, Coordinate start, Coordinate end)
 	{
 		//	Create a grid onto which the moves shall be projected
-		var keypadGrid = new MazeGrid(x, y);
+		var keypadGrid = new MazeGrid(width, height);
 		//	Storage for best paths found for each direction of movement
 		var bestPaths = new List<MazePath<DijkstraNode>>();
 
@@ -414,6 +427,9 @@ internal class KeypadConundrum
 
 		foreach (var direction in _directionalPrecedence)
 		{
+			var check = start + direction.Key.ToOffset();
+			if (!check.InBounds(keypadGrid.Bounds))
+				continue;
 			keypadGrid.MakeGridEmpty();
 			blocked.ForEach(c => keypadGrid[c] = MazeCellType.Wall);
 			keypadGrid[start] = MazeCellType.Start;
@@ -435,7 +451,7 @@ internal class KeypadConundrum
 			}
 			catch (NullReferenceException)
 			{
-				Console.WriteLine($"Solver went bang! Params: [{x},{y}], {start}, {end}");
+				Console.WriteLine($"Solver went bang! Params: [{width},{height}], {start}, {end} => {direction.Key}");
 			}
 		}
 
