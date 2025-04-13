@@ -24,6 +24,8 @@ public partial class Day21
 		foreach (var code in InputFileLines)
 		{
 			var (keypresses, complexity) = solver.GetSolution(code, 2);
+			var c2 = solver.GetComplexity(code, 2);
+			Debug.Assert(c2 == complexity);
 			complexityTotal += complexity;
 		}
 		PartOneResult = $"{ChallengeTitle} complexity = {complexityTotal}";
