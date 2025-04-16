@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using AdventOfCode.Extensions;
 using AdventOfCode.Interfaces;
 using AdventOfCode.Models;
 
@@ -17,8 +16,11 @@ public partial class Day23
 	protected override bool PartTwo()
 	{
 		LoadAndReadFile();
-		var result = "N/A";
-		PartTwoResult = $"{ChallengeTitle} result = {result}";
+		var lanParty = new LanParty();
+		lanParty.LoadFromInput(InputFileLines);
+
+		var result = lanParty.GetLanPartyPassword();
+		PartTwoResult = $"{ChallengeTitle} password = {result}";
 		return true;
 	}
 
@@ -28,6 +30,10 @@ public partial class Day23
 
 	public void PartTwoTest()
 	{
+		var sut = new LanParty();
+		sut.LoadFromInput(_partOneTestInput);
+		var actual = sut.GetLanPartyPassword();
+		Debug.Assert("co,de,ka,ta" == actual);
 	}
 
 	#endregion
