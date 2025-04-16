@@ -21,10 +21,7 @@ internal class CrossedWires
 	/// <summary>
 	/// Returns a dictionary of the values for the "z" gates
 	/// </summary>
-	public Dictionary<string, int> ZGates => _gates.Keys
-		.Where(q => q.StartsWith('z'))
-		.OrderByDescending(o => o)
-		.ToDictionary(d => d, d => _gates[d]);
+	public Dictionary<string, int> ZGates => this['z'];
 
 	/// <summary>
 	/// Returns the operations to be performed as a Queue
@@ -38,6 +35,32 @@ internal class CrossedWires
 			return q;
 		}
 	}
+
+	/// <summary>
+	/// Returns a dictionary of gates that begin with <paramref name="c"/>
+	/// </summary>
+	/// <param name="c">The character the gates begin with</param>
+	/// <returns>A dictionary of the gates</returns>
+	public Dictionary<string, int> this[char c]
+	{
+		get
+		{
+			return _gates.Keys
+						.Where(q => q.StartsWith(c))
+						.OrderByDescending(o => o)
+						.ToDictionary(d => d, d => _gates[d]);
+		}
+	}
+
+	/// <summary>
+	/// Returns a dictionary of the values for the "x" gates
+	/// </summary>
+	public Dictionary<string, int> XGates => this['x'];
+
+	/// <summary>
+	/// Returns a dictionary of the values for the "y" gates
+	/// </summary>
+	public Dictionary<string, int> YGates => this['y'];
 
 	#endregion
 
@@ -99,14 +122,12 @@ internal class CrossedWires
 				"AND" => v1 & v2,
 				"OR" => v1 | v2,
 				"XOR" => v1 ^ v2,
-				_ => throw new InvalidOperationException($"Unknown operation: '{op}")
+				_ => throw new InvalidOperationException($"Unknown operation: '{op}'")
 			};
 			_gates[outGate] = v;
 		}
 
-		ulong result = 0;
-		ZGates.Values.ToList().ForEach(i => { result <<= 1; result |= (uint)i; });
-		return result;
+		return GetResult(ZGates);
 	}
 
 	/// <summary>
@@ -118,6 +139,13 @@ internal class CrossedWires
 	{
 		var parts = operation.Split(' ');
 		return (parts[0], parts[2], parts[1], parts[4]);
+	}
+
+	private static ulong GetResult(Dictionary<string, int> input)
+	{
+		ulong result = 0;
+		input.Values.ToList().ForEach(i => { result <<= 1; result |= (uint)i; });
+		return result;
 	}
 
 	#endregion
