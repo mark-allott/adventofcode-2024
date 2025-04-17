@@ -42,4 +42,33 @@ public static class StringExtensions
 		}
 		return rowValues;
 	}
+
+	/// <summary>
+	/// Iterate over the <paramref name="input"/>, splitting into sections identified by empty lines
+	/// </summary>
+	/// <param name="input">The strings to be parsed</param>
+	/// <returns>The <paramref name="input"/>, split into sections</returns>
+	public static List<List<string>> ParseEnumerableOfStringToListOfListOfString(this IEnumerable<string> input)
+	{
+		var result = new List<List<string>>();
+		var section = new List<string>();
+
+		foreach (var line in input)
+		{
+			if (string.IsNullOrWhiteSpace(line))
+			{
+				if (section.Count > 0)
+				{
+					result.Add(section);
+					section = new List<string>();
+				}
+			}
+			else
+				section.Add(line);
+		}
+		if (section.Count > 0)
+			result.Add(section);
+
+		return result;
+	}
 }
