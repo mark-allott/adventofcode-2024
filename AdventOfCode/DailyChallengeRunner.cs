@@ -94,16 +94,17 @@ public class DailyChallengeRunner
 	/// Executes the specified challenge, sending output to the console
 	/// </summary>
 	/// <param name="challenge">The challenge being executed</param>
-	/// <exception cref="ArgumentNullException">
+	/// <exception cref="ArgumentNullException"></exception>
 	private static void RunChallenge(IDailyChallenge challenge)
 	{
 		//	No challenge?? Throw an exception
 		ArgumentNullException.ThrowIfNull(challenge, nameof(challenge));
 
 		//	Write some output to the console stating which challenge is being run
-		Console.WriteLine($"Running challenge for day {challenge.DayNumber}");
+		var title = !string.IsNullOrWhiteSpace(challenge.ChallengeTitle) ? $": {challenge.ChallengeTitle}" : "";
+		Console.WriteLine($"Running challenge for day {challenge.DayNumber}{title}");
 
-		//	Run the challenge, state whether it was completed sucessfully
+		//	Run the challenge, state whether it was completed successfully
 		//	(both part one and part two must be completed successfully to be
 		//	stated as completely successful) and display the results
 		var result = challenge.Execute();

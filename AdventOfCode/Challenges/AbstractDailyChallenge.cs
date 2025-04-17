@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using AdventOfCode.Extensions;
 using AdventOfCode.Interfaces;
 
 namespace AdventOfCode.Challenges;
@@ -9,7 +10,7 @@ public abstract class AbstractDailyChallenge
 {
 	#region ctor
 
-	protected AbstractDailyChallenge(int dayNumber, string filename = "")
+	protected AbstractDailyChallenge(int dayNumber, string filename = "", string title = "")
 	{
 		ArgumentOutOfRangeException.ThrowIfLessThan<int>(dayNumber, 1, nameof(dayNumber));
 		ArgumentOutOfRangeException.ThrowIfGreaterThan<int>(dayNumber, 25, nameof(dayNumber));
@@ -17,6 +18,7 @@ public abstract class AbstractDailyChallenge
 
 		DayNumber = dayNumber;
 		Filename = filename;
+		ChallengeTitle = title;
 		//	Blank out the result strings
 		PartOneResult = PartTwoResult = string.Empty;
 	}
@@ -33,11 +35,14 @@ public abstract class AbstractDailyChallenge
 
 	public string PartTwoResult { get; protected set; }
 
+	public string ChallengeTitle { get; private set; }
+
 	/// <inheritdoc/>
 	public bool Execute()
 	{
 		try
 		{
+			ExecuteTests();
 			var result1 = ExecutePartOne();
 			var result2 = ExecutePartTwo();
 			return result1 && result2;
@@ -54,7 +59,16 @@ public abstract class AbstractDailyChallenge
 	{
 		try
 		{
-			return PartOne();
+			var sw = Stopwatch.StartNew();
+			try
+			{
+				return PartOne();
+			}
+			finally
+			{
+				sw.Stop();
+				PartOneResult = $"{PartOneResult} ({sw.ElapsedMilliseconds}ms / {sw.Elapsed.Ticks} Ticks)";
+			}
 		}
 		catch (Exception e)
 		{
@@ -72,7 +86,6 @@ public abstract class AbstractDailyChallenge
 	protected virtual bool PartOne()
 	{
 		throw new NotImplementedException($"{nameof(ExecutePartOne)} is not implemented");
-
 	}
 
 	/// <inheritdoc/>
@@ -80,7 +93,16 @@ public abstract class AbstractDailyChallenge
 	{
 		try
 		{
-			return PartTwo();
+			var sw = Stopwatch.StartNew();
+			try
+			{
+				return PartTwo();
+			}
+			finally
+			{
+				sw.Stop();
+				PartTwoResult = $"{PartTwoResult} ({sw.ElapsedMilliseconds}ms / {sw.Elapsed.Ticks} Ticks)";
+			}
 		}
 		catch (Exception e)
 		{
@@ -98,6 +120,47 @@ public abstract class AbstractDailyChallenge
 	protected virtual bool PartTwo()
 	{
 		throw new NotImplementedException($"{nameof(ExecutePartTwo)} is not implemented");
+	}
+
+	/// <summary>
+	/// If the class is testable (by decorating with IPartOneTestable, IPartTwoTestable or ITestable), run those tests
+	/// </summary>
+	private void ExecuteTests()
+	{
+		var isPartOneTestable = this.GetType()
+			.GetInterfaces()
+			.Any(x => x.IsAssignableFrom(typeof(IPartOneTestable)));
+		var isPartTwoTestable = this.GetType()
+			.GetInterfaces()
+			.Any(x => x.IsAssignableFrom(typeof(IPartTwoTestable)));
+
+		var isResettable = this.GetType()
+			.GetInterfaces()
+			.Any(x => x.IsAssignableFrom(typeof(IResettable)));
+
+		var sw = new Stopwatch();
+		if (isPartOneTestable)
+		{
+			Console.WriteLine($"Executing tests in {nameof(IPartOneTestable.PartOneTest)}");
+			sw.Start();
+			((IPartOneTestable)this).PartOneTest();
+			sw.Stop();
+			if (isResettable)
+				((IResettable)this).Reset();
+			Console.WriteLine($"{nameof(IPartOneTestable.PartOneTest)} tests completed ({sw.Elapsed.Ticks} Ticks)");
+		}
+
+		if (isPartTwoTestable)
+		{
+			sw.Reset();
+			Console.WriteLine($"Executing tests in {nameof(IPartTwoTestable.PartTwoTest)}");
+			sw.Start();
+			((IPartTwoTestable)this).PartTwoTest();
+			sw.Stop();
+			if (isResettable)
+				((IResettable)this).Reset();
+			Console.WriteLine($"{nameof(IPartTwoTestable.PartTwoTest)} tests completed ({sw.Elapsed.Ticks} Ticks)");
+		}
 	}
 
 	#endregion
@@ -144,25 +207,9 @@ public abstract class AbstractDailyChallenge
 
 		foreach (var line in lines)
 		{
-			var parts = line.Split([' ', ','], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-			var counter = 1;
-			var rowValues = new List<int>();
-			foreach (var part in parts)
-			{
-				if (int.TryParse(part, out var v))
-				{
-					counter++;
-					rowValues.Add(v);
-				}
-				else
-				{
-					var message = $"Data error on line {rowNumber} with part #{counter} => '{part}'";
-					Console.WriteLine(message);
-					throw new ArgumentException(message);
-				}
-			}
+			var rowValues = line.ParseStringToListOfInt(rowNumber);
 			results.Add(rowValues);
+			rowNumber++;
 		}
 		return results;
 	}
